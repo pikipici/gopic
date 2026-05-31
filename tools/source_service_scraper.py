@@ -11,6 +11,7 @@ smoke-tested before a real target is wired.
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import os
 import time
@@ -280,6 +281,237 @@ class KomikCastScraper(Scraper):
         return int(match.group(0)) if match else None
 
 
+class MangaThemesiaScraper(Scraper):
+    """Generic MangaThemesia/WP Manga scraper used by KomikIndo-like sites."""
+
+    manga_path = "/manga"
+
+    def search(self, query: str) -> dict[str, Any]:
+        if not query.strip():
+            return {"results": []}
+        html_text = self.fetch_text(f"{self.manga_path}/?{urlencode({'title': query, 'page': '1'})}")
+        return {"results": self._parse_search_results(html_text)[:12]}
+
+    def detail(self, series_id: str) -> dict[str, Any]:
+        html_text = self.fetch_text(f"{self.manga_path}/{quote(series_id)}/")
+        result = self._parse_detail(series_id, html_text)
+        result["chapters"] = self._parse_chapters(series_id, html_text)
+        result["chapterCount"] = len(result["chapters"])
+        return result
+
+    def import_series(self, series_id: str) -> dict[str, Any]:
+        detail = self.detail(series_id)
+        return {
+            "series": {
+                "slug": series_id,
+                "title": detail["title"],
+                "altTitles": detail.get("altTitles", []),
+                "synopsis": detail.get("synopsis", ""),
+                "coverUrl": detail.get("coverUrl", ""),
+                "type": detail.get("type", "manga"),
+                "status": detail.get("status", "unknown"),
+                "contentRating": "teen",
+                "demographic": "general",
+                "authorName": detail.get("authorName", ""),
+                "artistName": detail.get("artistName", ""),
+                "releaseYear": detail.get("releaseYear") or 1900,
+                "genres": detail.get("genres", []),
+                "featured": False,
+                "sourceSeriesId": series_id,
+                "sourceUrl": detail["url"],
+            },
+            "chapters": [
+                {
+                    "slug": chapter["slug"],
+                    "numberLabel": chapter["numberLabel"],
+                    "numberSort": chapter["numberSort"],
+                    "title": chapter["title"],
+                    "publishedAt": chapter["publishedAt"],
+                    "sourceChapterId": chapter["sourceChapterId"],
+                }
+                for chapter in detail["chapters"]
+            ],
+        }
+
+    def pages(self, series_id: str, chapter_slug: str) -> dict[str, Any]:
+        chapter_url = self._chapter_url(series_id, chapter_slug)
+        html_text = self.fetch_text(chapter_url)
+        reader = self._extract_block(html_text, r'<div[^>]+id=["\']readerarea["\'][^>]*>', "</div>") or html_text
+        images = self._image_urls(reader)
+        if not images:
+            raise SourceError("chapter pages not found", status=404)
+        return {"pages": [{"pageNumber": idx + 1, "imageUrl": image} for idx, image in enumerate(images)]}
+
+    def _parse_search_results(self, html_text: str) -> list[dict[str, str]]:
+        results: list[dict[str, str]] = []
+        for block in re.findall(r'<div class=["\']bsx["\'][^>]*>(.*?)</a>\s*</div>', html_text, flags=re.S | re.I):
+            href = self._attr(block, "href")
+            title = self._attr(block, "title") or self._text(self._extract_tag(block, "div", "tt"))
+            cover = self._image_urls(block)
+            slug = self._series_slug_from_url(href)
+            if slug and title:
+                results.append({"id": slug, "title": title, "url": self._abs_url(href), "coverUrl": cover[0] if cover else ""})
+        return results
+
+    def _parse_detail(self, series_id: str, html_text: str) -> dict[str, Any]:
+        title = self._text(self._extract_tag(html_text, "h1", "entry-title")) or self._title_from_head(html_text) or series_id
+        cover_block = self._extract_tag(html_text, "div", "thumb") or self._extract_tag(html_text, "div", "infomanga") or html_text
+        covers = self._image_urls(cover_block)
+        synopsis = self._text(self._extract_tag(html_text, "div", "entry-content")) or self._text(self._extract_tag(html_text, "div", "desc"))
+        genres = [self._text(match) for match in re.findall(r'<(?:div|span)[^>]+class=["\'][^"\']*(?:gnr|mgen)[^"\']*["\'][^>]*>(.*?)</(?:div|span)>', html_text, flags=re.S | re.I)]
+        if genres:
+            genres = [item for genre in genres for item in [part.strip() for part in genre.split(",")] if item]
+        return {
+            "id": series_id,
+            "title": title,
+            "url": f"{self.config.base_url.rstrip('/')}{self.manga_path}/{series_id}/",
+            "coverUrl": covers[0] if covers else "",
+            "synopsis": synopsis,
+            "type": self._type(html_text),
+            "status": self._status(html_text),
+            "authorName": self._info_value(html_text, ["Author", "Pengarang", "Mangaka"]),
+            "artistName": self._info_value(html_text, ["Artist", "Artis", "Ilustrator"]),
+            "releaseYear": self._year(self._info_value(html_text, ["Released", "Year", "Tahun"])) or 1900,
+            "genres": genres[:12],
+        }
+
+    def _parse_chapters(self, series_id: str, html_text: str) -> list[dict[str, Any]]:
+        chapters: list[dict[str, Any]] = []
+        for block in re.findall(r'<li[^>]*data-num=["\']([^"\']+)["\'][^>]*>(.*?)</li>', html_text, flags=re.S | re.I):
+            raw_num, body = block
+            href = self._attr(body, "href")
+            slug = self._chapter_slug_from_url(series_id, href) or self._format_chapter_index(raw_num)
+            title = self._text(self._extract_tag(body, "span", "chapternum")) or f"Chapter {raw_num}"
+            chapters.append({
+                "id": f"{series_id}-{slug}",
+                "slug": slug,
+                "numberLabel": title,
+                "numberSort": self._number(raw_num),
+                "title": "",
+                "publishedAt": self._date_from_text(self._text(self._extract_tag(body, "span", "chapterdate"))),
+                "sourceChapterId": slug,
+            })
+        return chapters
+
+    def _chapter_url(self, series_id: str, chapter_slug: str) -> str:
+        if chapter_slug.startswith("http"):
+            return chapter_slug
+        if chapter_slug.endswith("bahasa-indonesia"):
+            return f"{self.config.base_url.rstrip('/')}/{chapter_slug}/"
+        return f"{self.config.base_url.rstrip('/')}/{series_id}-chapter-{chapter_slug}-bahasa-indonesia/"
+
+    def _chapter_slug_from_url(self, series_id: str, url: str) -> str:
+        return urlparse(url).path.strip("/")
+
+    def _series_slug_from_url(self, url: str) -> str:
+        parts = [part for part in urlparse(url).path.split("/") if part]
+        return parts[-1] if parts else ""
+
+    def _abs_url(self, url: str) -> str:
+        return urljoin(self.config.base_url.rstrip("/") + "/", url)
+
+    @staticmethod
+    def _attr(html_text: str, attr: str) -> str:
+        match = re.search(rf'{attr}=["\']([^"\']+)["\']', html_text, flags=re.I)
+        return html.unescape(match.group(1)) if match else ""
+
+    @staticmethod
+    def _extract_tag(html_text: str, tag: str, class_name: str) -> str:
+        match = re.search(rf'<{tag}[^>]+class=["\'][^"\']*{re.escape(class_name)}[^"\']*["\'][^>]*>(.*?)</{tag}>', html_text, flags=re.S | re.I)
+        return match.group(1) if match else ""
+
+    @staticmethod
+    def _extract_block(html_text: str, opening_pattern: str, closing: str) -> str:
+        start = re.search(opening_pattern, html_text, flags=re.I)
+        if not start:
+            return ""
+        end = html_text.find(closing, start.end())
+        return html_text[start.end(): end if end != -1 else len(html_text)]
+
+    @staticmethod
+    def _text(fragment: str) -> str:
+        cleaned = re.sub(r"<[^>]+>", " ", fragment or "")
+        return re.sub(r"\s+", " ", html.unescape(cleaned)).strip()
+
+    @staticmethod
+    def _image_urls(fragment: str) -> list[str]:
+        urls = []
+        for match in re.finditer(r'<img[^>]+(?:src|data-src|data-lazy-src)=["\']([^"\']+)["\']', fragment, flags=re.I):
+            url = html.unescape(match.group(1)).strip()
+            if url and not url.startswith("data:") and url not in urls:
+                urls.append(url)
+        return urls
+
+    @staticmethod
+    def _title_from_head(html_text: str) -> str:
+        match = re.search(r"<title>(.*?)</title>", html_text, flags=re.S | re.I)
+        return MangaThemesiaScraper._text(match.group(1)).split(" - ")[0] if match else ""
+
+    @staticmethod
+    def _info_value(html_text: str, labels: list[str]) -> str:
+        for label in labels:
+            patterns = [
+                rf'<(?:b|span)[^>]*>\s*{re.escape(label)}\s*:?\s*</(?:b|span)>\s*<[^>]+>(.*?)</[^>]+>',
+                rf'<div[^>]+class=["\'][^"\']*imptdt[^"\']*["\'][^>]*>\s*{re.escape(label)}\s*:?\s*<i[^>]*>(.*?)</i>',
+            ]
+            for pattern in patterns:
+                match = re.search(pattern, html_text, flags=re.S | re.I)
+                if match:
+                    return MangaThemesiaScraper._text(match.group(1))
+        return ""
+
+    @staticmethod
+    def _type(html_text: str) -> str:
+        text = html_text.lower()
+        if "manhwa" in text:
+            return "manhwa"
+        if "manhua" in text:
+            return "manhua"
+        return "manga"
+
+    @staticmethod
+    def _status(html_text: str) -> str:
+        text = html_text.lower()
+        if "completed" in text or "tamat" in text:
+            return "completed"
+        if "hiatus" in text:
+            return "hiatus"
+        if "dropped" in text or "cancel" in text:
+            return "cancelled"
+        if "ongoing" in text or "berjalan" in text:
+            return "ongoing"
+        return "unknown"
+
+    @staticmethod
+    def _number(value: Any) -> float:
+        match = re.search(r"\d+(?:\.\d+)?", str(value or ""))
+        return float(match.group(0)) if match else 0.0
+
+    @staticmethod
+    def _format_chapter_index(value: Any) -> str:
+        number = MangaThemesiaScraper._number(value)
+        return str(int(number)) if number.is_integer() else f"{number:g}"
+
+    @staticmethod
+    def _date_from_text(value: str) -> str | None:
+        for fmt in ("%B %d, %Y", "%b %d, %Y"):
+            try:
+                parsed = datetime.strptime(value, fmt).replace(tzinfo=timezone.utc)
+                return parsed.isoformat().replace("+00:00", "Z")
+            except ValueError:
+                pass
+        return None
+
+    @staticmethod
+    def _year(value: Any) -> int | None:
+        match = re.search(r"\d{4}", str(value or ""))
+        return int(match.group(0)) if match else None
+
+
+class KomikIndoScraper(MangaThemesiaScraper):
+    """KomikIndo adapter for the MangaThemesia WordPress layout."""
+
+
 class FixtureScraper(Scraper):
     """Deterministic implementation that proves the service contract works."""
 
@@ -448,7 +680,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run a scaffold JSON source service for Gomic.")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=19190)
-    parser.add_argument("--mode", choices=["fixture", "real", "komikcast"], default="fixture")
+    parser.add_argument("--mode", choices=["fixture", "real", "komikcast", "komikindo"], default="fixture")
     parser.add_argument("--source-base-url", default="")
     args = parser.parse_args()
 
@@ -465,6 +697,16 @@ def main() -> None:
                 timeout=config.timeout,
             )
         Handler.scraper = KomikCastScraper(config)
+    elif args.mode == "komikindo":
+        if not config.base_url:
+            config = SourceConfig(
+                base_url="https://komikindo.fit",
+                user_agent=config.user_agent,
+                referer=config.referer or "https://komikindo.fit/",
+                request_delay=config.request_delay,
+                timeout=config.timeout,
+            )
+        Handler.scraper = KomikIndoScraper(config)
     else:
         Handler.scraper = Scraper(config)
     server = ThreadingHTTPServer((args.host, args.port), Handler)

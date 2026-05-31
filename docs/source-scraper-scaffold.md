@@ -78,6 +78,43 @@ Source import accepts optional controls for large series:
 
 Avoid full-importing very large series such as `one-piece` until the UI exposes these options clearly.
 
+## KomikIndo Mode
+
+KomikIndo mode uses the MangaThemesia/WordPress HTML layout and defaults the upstream base URL to `https://komikindo.fit`:
+
+```bash
+SOURCE_USER_AGENT='Mozilla/5.0 GomicScraper/0.1' \
+SOURCE_REQUEST_DELAY=0.5 \
+python tools/source_service_scraper.py --port 19190 --mode komikindo
+```
+
+Try it directly with a lightweight one-chapter series:
+
+```bash
+curl 'http://localhost:19190/search?q=one%20piece'
+curl 'http://localhost:19190/series/dorobouneko-no-douzou-one-piece'
+curl 'http://localhost:19190/series/dorobouneko-no-douzou-one-piece/import'
+curl 'http://localhost:19190/series/dorobouneko-no-douzou-one-piece/chapters/dorobouneko-no-douzou-one-piece-bahasa-indonesia/pages'
+```
+
+Point Gomic API at it:
+
+```bash
+SOURCE_ID=komikindo \
+SOURCE_NAME="KomikIndo" \
+SOURCE_URL=http://localhost:19190 \
+DATABASE_URL='postgres://gomic:gomic_dev_password@localhost:5432/gomic?sslmode=disable' \
+ADDR=:18090 \
+ADMIN_TOKEN=dev-token \
+go run ./cmd/api
+```
+
+Run the live smoke test. The default series has one chapter, so the script uses `CHAPTER_LIMIT=1`:
+
+```bash
+bash tools/smoke_komikindo_source.sh
+```
+
 ## Real Mode
 
 Real mode starts the same HTTP service but returns `501` until parser methods are implemented:
