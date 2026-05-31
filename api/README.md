@@ -83,6 +83,14 @@ go run ./cmd/api
 
 `SOURCE_ID` / `SOURCE_NAME` / `SOURCE_URL` still work for a single legacy source and can be combined with `SOURCES_JSON`.
 
+For day-to-day local development, start the full multi-source stack from the repository root:
+
+```bash
+bash tools/dev_multisource.sh
+```
+
+It starts KomikCast on `19190`, KomikIndo on `19191`, the API on `18190`, and the web admin on `13000`, then prints the admin URL and token. Press `Ctrl+C` in that terminal to stop the stack.
+
 ## Source Import Options
 
 Admin source imports accept safety options in the request body:
