@@ -105,6 +105,7 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("POST /api/v1/admin/login", h.adminLogin)
 	mux.HandleFunc("GET /api/v1/admin/jobs", h.requireAdmin(h.adminJobsList))
 	mux.HandleFunc("GET /api/v1/admin/jobs/{jobID}", h.requireAdmin(h.adminJobDetail))
+	mux.HandleFunc("POST /api/v1/admin/jobs/{jobID}/retry", h.requireAdmin(h.adminJobRetry))
 	mux.HandleFunc("GET /api/v1/admin/series", h.requireAdmin(h.adminSeriesList))
 	mux.HandleFunc("POST /api/v1/admin/series", h.requireAdmin(h.adminSeriesUpsert))
 	mux.HandleFunc("GET /api/v1/admin/sources", h.requireAdmin(h.adminSourcesList))
@@ -276,6 +277,54 @@ func (h *Handler) adminJobDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeEnvelope(w, http.StatusOK, job, map[string]any{})
+}
+
+func (h *Handler) adminJobRetry(w http.ResponseWriter, r *http.Request) {
+	job, ok, err := h.jobs.Get(r.Context(), r.PathValue("jobID"))
+	if err != nil {
+		writeRepoError(w, err)
+		return
+	}
+	if !ok {
+		writeError(w, http.StatusNotFound, "not_found", "job not found")
+		return
+	}
+	if job.Status != jobs.StatusFailed {
+		writeError(w, http.StatusBadRequest, "bad_request", "only failed jobs can be retried")
+		return
+	}
+	if job.Type != "source_import" {
+		writeError(w, http.StatusBadRequest, "bad_request", "only source import jobs can be retried")
+		return
+	}
+	sourceID, _ := job.Payload["sourceId"].(string)
+	sourceSeriesID, _ := job.Payload["sourceSeriesId"].(string)
+	if sourceID == "" || sourceSeriesID == "" {
+		writeError(w, http.StatusBadRequest, "bad_request", "job payload is missing source import identifiers")
+		return
+	}
+	if _, ok := h.sources.Get(sourceID); !ok {
+		writeError(w, http.StatusNotFound, "not_found", "source not found")
+		return
+	}
+	options := sourceimport.DefaultImportOptions()
+	options.ChapterLimit = payloadInt(job.Payload, "chapterLimit")
+	if payloadBool(job.Payload, "metadataOnly") {
+		options.FetchPages = false
+		options.CachePages = false
+	}
+	if value, ok := payloadBoolValue(job.Payload, "cachePages"); ok {
+		options.CachePages = value
+	}
+	retry, err := h.jobs.Create(r.Context(), "source_import", "Queued source import retry", job.Payload)
+	if err != nil {
+		writeRepoError(w, err)
+		return
+	}
+	go h.runSourceJob(retry.ID, func(ctx context.Context, report sourceimport.ProgressFunc) (sourceimport.Result, error) {
+		return h.sourceImporter().ImportWithOptions(ctx, sourceID, sourceSeriesID, options, report)
+	})
+	writeEnvelope(w, http.StatusAccepted, retry, map[string]any{"retriedJobId": job.ID})
 }
 
 func (h *Handler) adminSourceImport(w http.ResponseWriter, r *http.Request) {
@@ -607,6 +656,40 @@ func withCORS(next http.Handler) http.Handler {
 		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+func payloadInt(payload map[string]any, key string) int {
+	value, ok := payload[key]
+	if !ok {
+		return 0
+	}
+	switch typed := value.(type) {
+	case int:
+		return typed
+	case int64:
+		return int(typed)
+	case float64:
+		return int(typed)
+	case json.Number:
+		parsed, _ := typed.Int64()
+		return int(parsed)
+	default:
+		return 0
+	}
+}
+
+func payloadBool(payload map[string]any, key string) bool {
+	value, ok := payloadBoolValue(payload, key)
+	return ok && value
+}
+
+func payloadBoolValue(payload map[string]any, key string) (bool, bool) {
+	value, ok := payload[key]
+	if !ok {
+		return false, false
+	}
+	typed, ok := value.(bool)
+	return typed, ok
 }
 
 func writeRepoError(w http.ResponseWriter, err error) {

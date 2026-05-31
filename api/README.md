@@ -138,5 +138,6 @@ For KomikCast live smoke testing, use `bash ../tools/smoke_komikcast_source.sh` 
 - `POST /api/v1/admin/series/{slug}/sync-source`
 - `GET /api/v1/admin/jobs?limit=12`
 - `GET /api/v1/admin/jobs/{jobID}`
+- `POST /api/v1/admin/jobs/{jobID}/retry`
 
 See `../docs/fase-3-api-contract.md` for full contract.

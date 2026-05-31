@@ -254,6 +254,23 @@ export default function AdminPage() {
     }
   }
 
+  async function handleJobRetry(job: AdminJob) {
+    setBusy(true);
+    try {
+      const retry = await adminFetch<AdminJob>(`/api/v1/admin/jobs/${job.id}/retry`, savedToken, { method: "POST" });
+      setMessage(`Retry queued for ${jobSeriesID(job) ?? job.id}.`);
+      pushToast({ tone: "info", title: "Retry queued", message: job.message });
+      await watchJob(retry, savedToken);
+      pushToast({ tone: "success", title: "Retry completed", message: `${jobSeriesID(retry) ?? retry.id} siap dicek lagi.` });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Gagal retry job.";
+      setMessage(errorMessage);
+      pushToast({ tone: "error", title: "Retry failed", message: errorMessage });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
@@ -464,6 +481,11 @@ export default function AdminPage() {
                 <div className={`h-full rounded-full ${job.status === "failed" ? "bg-red-300" : "bg-accent"}`} style={{ width: `${job.progress}%` }} />
               </div>
               <p className="mt-3 line-clamp-2 text-sm text-muted">{job.message}</p>
+              {job.status === "failed" && job.type === "source_import" ? (
+                <button onClick={() => void handleJobRetry(job)} disabled={!savedToken || busy} className="mt-3 rounded-xl border border-red-200/35 px-3 py-2 text-xs font-black text-red-100 transition hover:bg-red-200 hover:text-black disabled:opacity-40">
+                  Retry import
+                </button>
+              ) : null}
               <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted">
                 <span>Updated {formatDate(job.updatedAt)}</span>
                 {job.completedAt ? <span>Done {formatDate(job.completedAt)}</span> : null}
