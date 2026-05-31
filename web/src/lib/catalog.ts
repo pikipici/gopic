@@ -78,7 +78,9 @@ export async function getAllSeries(): Promise<SeriesSummary[]> {
 }
 
 export async function getFeaturedSeries(): Promise<SeriesSummary[]> {
-  return (await getAllSeries()).filter((series) => series.featured);
+  const allSeries = await getAllSeries();
+  const featured = allSeries.filter((series) => series.featured);
+  return featured.length ? featured : allSeries.filter((series) => series.chapterCount > 0).slice(0, 4);
 }
 
 export async function getRecentChapters() {
@@ -86,10 +88,12 @@ export async function getRecentChapters() {
 
   return details
     .flatMap((series) =>
-      series.chapters.map((chapter) => ({
-        series,
-        chapter,
-      })),
+      series.chapters
+        .filter((chapter) => chapter.pageCount > 0)
+        .map((chapter) => ({
+          series,
+          chapter,
+        })),
     )
     .sort((a, b) => b.chapter.publishedAt.localeCompare(a.chapter.publishedAt));
 }
