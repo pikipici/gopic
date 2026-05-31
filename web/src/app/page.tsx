@@ -30,7 +30,7 @@ export default async function Home() {
             <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300">
               KomikCast, KomikIndo, progress lokal, source badge, dan reader fallback sekarang nyambung dari catalog sampai halaman baca.
             </p>
-            <div className="mt-8 grid max-w-2xl grid-cols-3 gap-3">
+            <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
               <Stat label="Catalog" value={allSeries.length.toString()} />
               <Stat label="Readable" value={readableSeries.length.toString()} />
               <Stat label="Partial" value={partialCount.toString()} />

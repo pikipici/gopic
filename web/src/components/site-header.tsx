@@ -15,7 +15,7 @@ export function SiteHeader() {
           </span>
           <span className="text-lg font-bold tracking-tight text-white">Gomic</span>
         </Link>
-        <nav className="flex items-center gap-2 text-sm font-medium text-zinc-300">
+        <nav className="hidden items-center gap-2 text-sm font-medium text-zinc-300 sm:flex">
           {navItems.map((item) => (
             <Link
               key={item.href}
