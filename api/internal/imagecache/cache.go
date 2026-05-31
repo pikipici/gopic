@@ -42,7 +42,8 @@ func (c *Cache) CachePages(ctx context.Context, seriesSlug, chapterSlug string, 
 		}
 		cachedURL, err := c.cacheRemote(ctx, seriesSlug, chapterSlug, page)
 		if err != nil {
-			return nil, err
+			// Keep the original remote URL so a slow image host does not fail the whole import.
+			continue
 		}
 		items[index].ImageURL = cachedURL
 	}

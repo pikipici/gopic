@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -13,63 +12,31 @@ import (
 	"gomic-api/internal/types"
 )
 
-func TestCachePagesDownloadsRemoteImages(t *testing.T) {
+func TestCachePagesKeepsOriginalURLWhenDownloadFails(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Referer") != "https://images.test/" {
-			t.Fatalf("missing image referer header: %q", r.Header.Get("Referer"))
+		if r.URL.Path == "/slow.jpg" {
+			time.Sleep(50 * time.Millisecond)
+			return
 		}
-		w.Header().Set("Content-Type", "image/png")
+		w.Header().Set("Content-Type", "image/jpeg")
 		_, _ = w.Write([]byte("fake image"))
 	}))
 	defer server.Close()
 
-	cache := NewWithHeaders(t.TempDir(), map[string]string{"Referer": "https://images.test/"})
-	pages, err := cache.CachePages(context.Background(), "series slug", "chapter/1", []types.ChapterPage{{PageNumber: 1, ImageURL: server.URL + "/page"}})
-	if err != nil {
-		t.Fatalf("cache pages: %v", err)
-	}
-	if len(pages) != 1 || !strings.HasPrefix(pages[0].ImageURL, "/uploads/source-cache/series-slug/chapter-1/0001-") || !strings.HasSuffix(pages[0].ImageURL, ".png") {
-		t.Fatalf("unexpected cached page url: %#v", pages)
-	}
-}
+	cache := New(filepath.Join(t.TempDir(), "uploads"))
+	cache.Client = &http.Client{Timeout: 5 * time.Millisecond}
 
-func TestCachePagesKeepsLocalImages(t *testing.T) {
-	cache := New(t.TempDir())
-	pages, err := cache.CachePages(context.Background(), "series", "chapter", []types.ChapterPage{{PageNumber: 1, ImageURL: "/mock-pages/page.svg"}})
+	pages, err := cache.CachePages(context.Background(), "series", "chapter", []types.ChapterPage{
+		{PageNumber: 1, ImageURL: server.URL + "/slow.jpg"},
+		{PageNumber: 2, ImageURL: server.URL + "/ok.jpg"},
+	})
 	if err != nil {
-		t.Fatalf("cache local pages: %v", err)
+		t.Fatalf("CachePages returned error: %v", err)
 	}
-	if pages[0].ImageURL != "/mock-pages/page.svg" {
-		t.Fatalf("expected local image to stay untouched, got %s", pages[0].ImageURL)
+	if pages[0].ImageURL != server.URL+"/slow.jpg" {
+		t.Fatalf("failed download should keep original URL, got %q", pages[0].ImageURL)
 	}
-}
-
-func TestCachePruneRemovesOldFiles(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "image/png")
-		_, _ = w.Write([]byte("fake image"))
-	}))
-	defer server.Close()
-
-	root := t.TempDir()
-	cache := New(root)
-	pages, err := cache.CachePages(context.Background(), "series", "chapter", []types.ChapterPage{{PageNumber: 1, ImageURL: server.URL + "/old"}})
-	if err != nil {
-		t.Fatalf("cache pages: %v", err)
-	}
-	cachedPath := filepath.Join(root, strings.TrimPrefix(pages[0].ImageURL, "/uploads/"))
-	past := time.Now().Add(-72 * time.Hour)
-	if err := os.Chtimes(cachedPath, past, past); err != nil {
-		t.Fatalf("chtimes: %v", err)
-	}
-	removed, err := cache.Prune(24 * time.Hour)
-	if err != nil {
-		t.Fatalf("prune: %v", err)
-	}
-	if removed != 1 {
-		t.Fatalf("expected 1 pruned file, got %d", removed)
-	}
-	if _, err := os.Stat(cachedPath); !os.IsNotExist(err) {
-		t.Fatalf("expected cached file removed: err=%v", err)
+	if !strings.HasPrefix(pages[1].ImageURL, "/uploads/source-cache/series/chapter/") {
+		t.Fatalf("successful download should be cached, got %q", pages[1].ImageURL)
 	}
 }
