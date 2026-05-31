@@ -21,6 +21,7 @@ type SourceSummary = { id: string; name: string };
 type SourceResult = { sourceId: string; id: string; title: string; url: string; coverUrl: string };
 type SourceDetail = SourceResult & { synopsis: string; type: string; status: string; authorName: string; artistName: string; releaseYear: number; genres: string[]; chapterCount: number };
 type AdminJob = { id: string; type: string; status: "queued" | "running" | "completed" | "failed"; message: string; progress: number; payload?: Record<string, unknown>; createdAt?: string; updatedAt?: string; completedAt?: string };
+type Toast = { id: string; tone: "info" | "success" | "error"; title: string; message: string };
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "http://localhost:8080";
 
@@ -29,6 +30,12 @@ function statusClass(status: AdminJob["status"]) {
   if (status === "failed") return "bg-red-300/15 text-red-200 ring-red-300/20";
   if (status === "running") return "bg-sky-200/15 text-sky-100 ring-sky-200/20";
   return "bg-zinc-200/10 text-zinc-200 ring-white/10";
+}
+
+function toastClass(tone: Toast["tone"]) {
+  if (tone === "success") return "border-lime-300/25 bg-lime-300/10 text-lime-50 shadow-lime-950/30";
+  if (tone === "error") return "border-red-300/25 bg-red-300/10 text-red-50 shadow-red-950/30";
+  return "border-sky-200/25 bg-sky-200/10 text-sky-50 shadow-sky-950/30";
 }
 
 function formatDate(value?: string) {
@@ -96,6 +103,15 @@ export default function AdminPage() {
   const [cbzFile, setCbzFile] = useState<File | null>(null);
   const [message, setMessage] = useState("Masuk pakai ADMIN_TOKEN untuk mulai.");
   const [busy, setBusy] = useState(false);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const pushToast = (toast: Omit<Toast, "id">) => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    setToasts((current) => [...current, { ...toast, id }]);
+    window.setTimeout(() => {
+      setToasts((current) => current.filter((item) => item.id !== id));
+    }, 5000);
+  };
 
   const selectedSeries = useMemo(
     () => series.find((item) => item.slug === selectedSlug),
@@ -205,9 +221,13 @@ export default function AdminPage() {
       const limitLabel = chapterLimit > 0 ? `latest ${chapterLimit} chapter` : "semua chapter";
       const pageLabel = importMetadataOnly ? "metadata only" : importCachePages ? "cache pages" : "upstream page URLs";
       setMessage(`${result.title} import queued (${limitLabel}, ${pageLabel}).`);
+      pushToast({ tone: "info", title: "Import queued", message: `${result.title} (${limitLabel}, ${pageLabel})` });
       await watchJob(job, savedToken);
+      pushToast({ tone: "success", title: "Import completed", message: `${result.id} siap dibuka di reader.` });
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Gagal import source.");
+      const errorMessage = error instanceof Error ? error.message : "Gagal import source.";
+      setMessage(errorMessage);
+      pushToast({ tone: "error", title: "Import failed", message: errorMessage });
     } finally {
       setBusy(false);
     }
@@ -619,6 +639,27 @@ export default function AdminPage() {
           </form>
         </div>
       </section>
+
+      <div className="fixed bottom-4 right-4 z-50 flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-3">
+        {toasts.map((toast) => (
+          <article key={toast.id} className={`rounded-2xl border p-4 shadow-2xl backdrop-blur-xl ${toastClass(toast.tone)}`} role="status">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="font-black">{toast.title}</p>
+                <p className="mt-1 text-sm opacity-80">{toast.message}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setToasts((current) => current.filter((item) => item.id !== toast.id))}
+                className="rounded-full border border-white/10 px-2 py-1 text-xs font-black opacity-70 transition hover:opacity-100"
+                aria-label="Close notification"
+              >
+                x
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
     </main>
   );
 }
