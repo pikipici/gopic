@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { FormEvent, useCallback, useMemo, useState } from "react";
 import type { ChapterPage, ChapterSummary, SeriesSummary } from "@/lib/types";
 
@@ -457,7 +456,7 @@ export default function AdminPage() {
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {sourceResults.map((result) => (
             <article key={`${result.sourceId}-${result.id}`} className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/25 p-3 transition hover:border-sky-200/30">
-              <Image src={result.coverUrl} alt="" width={56} height={80} className="h-20 w-14 rounded-xl object-cover" />
+              <img src={result.coverUrl} alt="" width={56} height={80} className="h-20 w-14 rounded-xl object-cover" />
               <div className="min-w-0 flex-1">
                 <h3 className="truncate font-bold">{result.title}</h3>
                 <p className="mt-1 truncate text-xs text-muted">{result.sourceId} / {result.id}</p>
@@ -471,7 +470,7 @@ export default function AdminPage() {
         </div>
         {sourcePreview ? (
           <article className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-black/25 p-4 shadow-xl shadow-black/20 md:grid-cols-[96px_1fr] xl:grid-cols-[96px_1fr_320px]">
-            <Image src={sourcePreview.coverUrl} alt="" width={96} height={136} className="h-[136px] w-24 rounded-2xl object-cover" />
+            <img src={sourcePreview.coverUrl} alt="" width={96} height={136} className="h-[136px] w-24 rounded-2xl object-cover" />
             <div>
               <p className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-sky-200">Preview loaded</p>
               <h3 className="mt-1 text-2xl font-black">{sourcePreview.title}</h3>
