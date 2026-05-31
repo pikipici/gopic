@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { ReaderProgressTracker } from "@/components/reader-progress-tracker";
 import { getChapterProgress } from "@/lib/reading-progress";
 import type { ChapterPage } from "@/lib/types";
@@ -59,6 +59,82 @@ function loadSettings(): ReaderSettings {
   } catch {
     return defaultSettings;
   }
+}
+
+type ReaderPageImageProps = {
+  page: ChapterPage;
+};
+
+function ReaderPageImage({ page }: ReaderPageImageProps) {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
+  const resolvedUrl = resolvePageImageUrl(page.imageUrl);
+
+  if (!page.imageUrl) {
+    return <PageFallback pageNumber={page.pageNumber} message="Image URL kosong dari source." />;
+  }
+
+  if (failed) {
+    return (
+      <PageFallback pageNumber={page.pageNumber} message="Gagal load image page ini." imageUrl={resolvedUrl}>
+        <button
+          type="button"
+          onClick={() => {
+            setFailed(false);
+            setLoaded(false);
+            setRetryKey((value) => value + 1);
+          }}
+          className="rounded-full bg-lime-300 px-4 py-2 text-sm font-black text-black transition hover:bg-lime-200"
+        >
+          Retry page
+        </button>
+      </PageFallback>
+    );
+  }
+
+  return (
+    <div className="relative min-h-80 bg-zinc-950">
+      {!loaded ? (
+        <div className="absolute inset-0 grid min-h-80 place-items-center border border-white/5 bg-[radial-gradient(circle_at_center,rgba(190,242,100,0.12),transparent_45%)] text-sm font-bold text-zinc-400">
+          Loading page {page.pageNumber}...
+        </div>
+      ) : null}
+      <img
+        key={retryKey}
+        src={resolvedUrl}
+        alt={`Page ${page.pageNumber}`}
+        loading={page.pageNumber <= 2 ? "eager" : "lazy"}
+        onLoad={() => setLoaded(true)}
+        onError={() => setFailed(true)}
+        className={`block h-auto w-full border border-white/5 bg-zinc-950 transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+      />
+    </div>
+  );
+}
+
+function PageFallback({
+  pageNumber,
+  message,
+  imageUrl,
+  children,
+}: {
+  pageNumber: number;
+  message: string;
+  imageUrl?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <div className="grid min-h-80 place-items-center border border-amber-200/20 bg-amber-200/10 p-6 text-center text-amber-100">
+      <div className="max-w-xl">
+        <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-200">Page {pageNumber}</p>
+        <h3 className="mt-3 text-2xl font-black text-white">Image unavailable</h3>
+        <p className="mt-2 text-sm text-amber-100/85">{message}</p>
+        {imageUrl ? <p className="mt-3 break-all text-xs text-amber-100/60">{imageUrl}</p> : null}
+        {children ? <div className="mt-5">{children}</div> : null}
+      </div>
+    </div>
+  );
 }
 
 export function ReaderShell({
@@ -123,12 +199,7 @@ export function ReaderShell({
             data-reader-page={page.pageNumber}
             className={`mx-auto ${widthClass[settings.width]} ${gapClass[settings.gap]} overflow-hidden bg-zinc-950 shadow-2xl shadow-black/40 sm:rounded-[1.75rem]`}
           >
-            <img
-              src={resolvePageImageUrl(page.imageUrl)}
-              alt={`Page ${page.pageNumber}`}
-              loading={page.pageNumber <= 2 ? "eager" : "lazy"}
-              className="block h-auto w-full border border-white/5 bg-zinc-950"
-            />
+            <ReaderPageImage page={page} />
           </section>
         ))}
       </div>
