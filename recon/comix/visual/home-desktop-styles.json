@@ -1,0 +1,2999 @@
+{
+  "title": "Comix - Read Comics online for free",
+  "url": "https://comix.to/",
+  "body": {
+    "tag": "body",
+    "cls": "",
+    "text": "BrowseLog inANNOUNCEMENTSMay 29We've resolved all known issues and improved overall site stability.If you can't find a series you're looking for, try changing the rating in your Content Filter.If you'd like to upload con",
+    "bg": "rgb(34, 40, 42)",
+    "color": "rgb(205, 213, 214)",
+    "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+    "fs": "14px",
+    "fw": "400",
+    "radius": "0px",
+    "shadow": "none",
+    "display": "flex",
+    "pos": "static",
+    "gap": "normal",
+    "gridCols": "none",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 4396
+    }
+  },
+  "header": [
+    {
+      "tag": "header",
+      "cls": "topnav",
+      "text": "BrowseLog in",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "sticky",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1440,
+        "h": 64
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "topnav__inner",
+      "text": "BrowseLog in",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "24px",
+      "gridCols": "112px 1013.78px 170.219px",
+      "rect": {
+        "x": 20,
+        "y": 0,
+        "w": 1400,
+        "h": 64
+      }
+    },
+    {
+      "tag": "nav",
+      "cls": "topnav__right",
+      "text": "Log in",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "8px",
+      "gridCols": "none",
+      "rect": {
+        "x": 1222,
+        "y": 12,
+        "w": 170,
+        "h": 40
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__header",
+      "text": "Most Recent Popular",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "16px",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 363,
+        "w": 960,
+        "h": 34
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "nav-btns",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "4px",
+      "gridCols": "none",
+      "rect": {
+        "x": 898,
+        "y": 363,
+        "w": 110,
+        "h": 34
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "nav-btn",
+      "text": "",
+      "bg": "rgb(42, 49, 52)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "4px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 898,
+        "y": 363,
+        "w": 34,
+        "h": 34
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "nav-btn",
+      "text": "",
+      "bg": "rgb(42, 49, 52)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "4px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 936,
+        "y": 363,
+        "w": 34,
+        "h": 34
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "nav-menu",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "relative",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 974,
+        "y": 363,
+        "w": 34,
+        "h": 34
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "nav-btn nav-btn--kebab ",
+      "text": "",
+      "bg": "rgb(42, 49, 52)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "4px",
+      "shadow": "none",
+      "display": "inline-flex",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 974,
+        "y": 363,
+        "w": 34,
+        "h": 34
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__header",
+      "text": "Most Follows · New Comics",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "16px",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 794,
+        "w": 960,
+        "h": 34
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "nav-btns",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "4px",
+      "gridCols": "none",
+      "rect": {
+        "x": 898,
+        "y": 794,
+        "w": 110,
+        "h": 34
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "nav-btn",
+      "text": "",
+      "bg": "rgb(42, 49, 52)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "4px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 898,
+        "y": 794,
+        "w": 34,
+        "h": 34
+      }
+    }
+  ],
+  "mainSections": [
+    {
+      "tag": "main",
+      "cls": "layout layout--top",
+      "text": "ANNOUNCEMENTSMay 29We've resolved all known issues and improved overall site stability.If you can't find a series you're looking for, try changing the rating in your Content Filter.If you'd like to upload content to Comi",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "44px",
+      "gridCols": "960px 340px",
+      "rect": {
+        "x": 20,
+        "y": 64,
+        "w": 1400,
+        "h": 3934
+      }
+    },
+    {
+      "tag": "section",
+      "cls": "section",
+      "text": "Most Recent Popular1Ch.72.86h agoAnyone Can Beat the Original2Ch.715d agoThe Chick-Class Hunter is Filial!3Ch.366d agoThe Circumstances of Being Chosen as the Villainess's Favorite4Ch.591h agoBarbarian's Adventure in a F",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 363,
+        "w": 960,
+        "h": 383
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__header",
+      "text": "Most Recent Popular",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "16px",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 363,
+        "w": 960,
+        "h": 34
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__title-wrap",
+      "text": "Most Recent Popular",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 367,
+        "w": 197,
+        "h": 30
+      }
+    },
+    {
+      "tag": "h2",
+      "cls": "section__title",
+      "text": "Most Recent Popular",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "20px",
+      "fw": "600",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 367,
+        "w": 197,
+        "h": 30
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__controls",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "12px",
+      "gridCols": "none",
+      "rect": {
+        "x": 898,
+        "y": 363,
+        "w": 110,
+        "h": 34
+      }
+    },
+    {
+      "tag": "section",
+      "cls": "section",
+      "text": "Most Follows · New Comics1Ch.201h agoThe Eldest Daughter of the Tang Clan of Sacheon Protects the Family2Ch.311d agoHow to Get on the Main Character's Flower Path3Ch.5423h agoThe Villain Wants to Live4Ch.2323h agoThe Whi",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 794,
+        "w": 960,
+        "h": 383
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__header",
+      "text": "Most Follows · New Comics",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "16px",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 794,
+        "w": 960,
+        "h": 34
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__title-wrap",
+      "text": "Most Follows · New Comics",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 798,
+        "w": 255,
+        "h": 30
+      }
+    },
+    {
+      "tag": "h2",
+      "cls": "section__title",
+      "text": "Most Follows · New Comics",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "20px",
+      "fw": "600",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 798,
+        "w": 255,
+        "h": 30
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__controls",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "12px",
+      "gridCols": "none",
+      "rect": {
+        "x": 898,
+        "y": 794,
+        "w": 110,
+        "h": 34
+      }
+    },
+    {
+      "tag": "section",
+      "cls": "section",
+      "text": "Latest UpdatesHotNewCh.12317m agoA Talented MaidCh.691h agoI Became the Youngest Sister-in-law of the Ruined Reverse Harem's Male LeadsCh.881h agoThe Legendary Hero is an Academy Honors StudentCh.1091h agoRadiant RewindC",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 1226,
+        "w": 960,
+        "h": 2235
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__header",
+      "text": "Latest UpdatesHotNew",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "16px",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 1226,
+        "w": 960,
+        "h": 34
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__title-wrap",
+      "text": "Latest Updates",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 1230,
+        "w": 143,
+        "h": 30
+      }
+    },
+    {
+      "tag": "h2",
+      "cls": "section__title",
+      "text": "Latest Updates",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "20px",
+      "fw": "600",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 1230,
+        "w": 143,
+        "h": 30
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__controls",
+      "text": "HotNew",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "12px",
+      "gridCols": "none",
+      "rect": {
+        "x": 775,
+        "y": 1226,
+        "w": 233,
+        "h": 34
+      }
+    },
+    {
+      "tag": "section",
+      "cls": "section",
+      "text": "View more →User Collections✦ ݁˖wavering.✦11 titles1d agoActionEvapark14 titles11m agoAmazing Action Manwha (no romance harem)Alicia Sherin13 titles22m agoNeed to read😉❤️Alicia Sherin13 titles22m agoNeed to read😉❤️Alici",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 3509,
+        "w": 960,
+        "h": 409
+      }
+    },
+    {
+      "tag": "a",
+      "cls": "see-all hcoll-section__more",
+      "text": "View more →",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "12px",
+      "fw": "500",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "inline-block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 3511,
+        "w": 72,
+        "h": 18
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__header",
+      "text": "User Collections",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "16px",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 3535,
+        "w": 960,
+        "h": 34
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__title-wrap",
+      "text": "User Collections",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 3539,
+        "w": 155,
+        "h": 30
+      }
+    },
+    {
+      "tag": "h2",
+      "cls": "section__title",
+      "text": "User Collections",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "20px",
+      "fw": "600",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 3539,
+        "w": 155,
+        "h": 30
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "section__controls",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "12px",
+      "gridCols": "none",
+      "rect": {
+        "x": 936,
+        "y": 3535,
+        "w": 72,
+        "h": 34
+      }
+    }
+  ],
+  "cards": [
+    {
+      "tag": "div",
+      "cls": "card__rank-slot",
+      "text": "1Ch.72.86h agoAnyone Can Beat the Original",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "relative",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 415,
+        "w": 181,
+        "h": 331
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__rank",
+      "text": "1",
+      "bg": "rgba(0, 0, 0, 0.65)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "12px",
+      "fw": "600",
+      "radius": "999px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "absolute",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 56,
+        "y": 423,
+        "w": 27,
+        "h": 22
+      }
+    },
+    {
+      "tag": "a",
+      "cls": "card",
+      "text": "Ch.72.86h agoAnyone Can Beat the Original",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "10px",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 415,
+        "w": 181,
+        "h": 331
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__poster-wrap",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "relative",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 415,
+        "w": 181,
+        "h": 253
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "absolute",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 197,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 197,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__body",
+      "text": "Ch.72.86h agoAnyone Can Beat the Original",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "4px",
+      "gridCols": "none",
+      "rect": {
+        "x": 48,
+        "y": 678,
+        "w": 181,
+        "h": 62
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__meta",
+      "text": "Ch.72.86h ago",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(111, 119, 120)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "12px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "14px",
+      "gridCols": "none",
+      "rect": {
+        "x": 50,
+        "y": 678,
+        "w": 177,
+        "h": 18
+      }
+    },
+    {
+      "tag": "span",
+      "cls": "card__ch",
+      "text": "Ch.72.8",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "12px",
+      "fw": "500",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "4px",
+      "gridCols": "none",
+      "rect": {
+        "x": 52,
+        "y": 678,
+        "w": 41,
+        "h": 18
+      }
+    },
+    {
+      "tag": "span",
+      "cls": "card__time",
+      "text": "6h ago",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(111, 119, 120)",
+      "font": "\"Geist Mono\", ui-monospace, Menlo, Monaco, monospace",
+      "fs": "11px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 185,
+        "y": 679,
+        "w": 40,
+        "h": 17
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__title",
+      "text": "Anyone Can Beat the Original",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "600",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flow-root",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 50,
+        "y": 704,
+        "w": 177,
+        "h": 36
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__rank-slot",
+      "text": "2Ch.715d agoThe Chick-Class Hunter is Filial!",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "relative",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 243,
+        "y": 415,
+        "w": 181,
+        "h": 331
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__rank",
+      "text": "2",
+      "bg": "rgba(0, 0, 0, 0.65)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "12px",
+      "fw": "600",
+      "radius": "999px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "absolute",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 251,
+        "y": 423,
+        "w": 29,
+        "h": 22
+      }
+    },
+    {
+      "tag": "a",
+      "cls": "card",
+      "text": "Ch.715d agoThe Chick-Class Hunter is Filial!",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "10px",
+      "gridCols": "none",
+      "rect": {
+        "x": 243,
+        "y": 415,
+        "w": 181,
+        "h": 331
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__poster-wrap",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "relative",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 243,
+        "y": 415,
+        "w": 181,
+        "h": 253
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "absolute",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 392,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 392,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__body",
+      "text": "Ch.715d agoThe Chick-Class Hunter is Filial!",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "4px",
+      "gridCols": "none",
+      "rect": {
+        "x": 243,
+        "y": 678,
+        "w": 181,
+        "h": 62
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__meta",
+      "text": "Ch.715d ago",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(111, 119, 120)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "12px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "14px",
+      "gridCols": "none",
+      "rect": {
+        "x": 245,
+        "y": 678,
+        "w": 177,
+        "h": 18
+      }
+    },
+    {
+      "tag": "span",
+      "cls": "card__ch",
+      "text": "Ch.71",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "12px",
+      "fw": "500",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "4px",
+      "gridCols": "none",
+      "rect": {
+        "x": 247,
+        "y": 678,
+        "w": 29,
+        "h": 18
+      }
+    },
+    {
+      "tag": "span",
+      "cls": "card__time",
+      "text": "5d ago",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(111, 119, 120)",
+      "font": "\"Geist Mono\", ui-monospace, Menlo, Monaco, monospace",
+      "fs": "11px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 380,
+        "y": 679,
+        "w": 40,
+        "h": 17
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__title",
+      "text": "The Chick-Class Hunter is Filial!",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "600",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "flow-root",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 245,
+        "y": 704,
+        "w": 177,
+        "h": 36
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__rank-slot",
+      "text": "3Ch.366d agoThe Circumstances of Being Chosen as the Villainess's Favorite",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "relative",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 438,
+        "y": 415,
+        "w": 181,
+        "h": 331
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "card__rank",
+      "text": "3",
+      "bg": "rgba(0, 0, 0, 0.65)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "12px",
+      "fw": "600",
+      "radius": "999px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "absolute",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 446,
+        "y": 423,
+        "w": 29,
+        "h": 22
+      }
+    }
+  ],
+  "buttons": [
+    {
+      "tag": "button",
+      "cls": "icon-btn search-toggle",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "6px",
+      "shadow": "none",
+      "display": "none",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "search__close",
+      "text": "",
+      "bg": "rgb(240, 240, 240)",
+      "color": "rgb(0, 0, 0)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "none",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "icon-btn",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "6px",
+      "shadow": "none",
+      "display": "inline-flex",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 1222,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "icon-btn",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "6px",
+      "shadow": "none",
+      "display": "inline-flex",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 1270,
+        "y": 12,
+        "w": 40,
+        "h": 40
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "login-btn",
+      "text": "Log in",
+      "bg": "rgb(205, 213, 214)",
+      "color": "rgb(34, 40, 42)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13px",
+      "fw": "600",
+      "radius": "6px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 1318,
+        "y": 12,
+        "w": 74,
+        "h": 40
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "nav-btn",
+      "text": "",
+      "bg": "rgb(42, 49, 52)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "4px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 898,
+        "y": 363,
+        "w": 34,
+        "h": 34
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "nav-btn",
+      "text": "",
+      "bg": "rgb(42, 49, 52)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "4px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 936,
+        "y": 363,
+        "w": 34,
+        "h": 34
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "nav-btn nav-btn--kebab ",
+      "text": "",
+      "bg": "rgb(42, 49, 52)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "4px",
+      "shadow": "none",
+      "display": "inline-flex",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 974,
+        "y": 363,
+        "w": 34,
+        "h": 34
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 197,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 392,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 586,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 781,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 976,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 1171,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 1366,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 1560,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 1755,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 1950,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 2145,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "card__action card__action--menu ",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0.6)",
+      "color": "rgb(255, 255, 255)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "50%",
+      "shadow": "none",
+      "display": "grid",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "26px",
+      "rect": {
+        "x": 2340,
+        "y": 421,
+        "w": 26,
+        "h": 26
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "div",
+      "cls": "search ",
+      "text": "Browse",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "contents",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "icon-btn search-toggle",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "6px",
+      "shadow": "none",
+      "display": "none",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0
+      }
+    },
+    {
+      "tag": "form",
+      "cls": "search__form",
+      "text": "Browse",
+      "bg": "rgb(42, 49, 52)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "6px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "relative",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 441,
+        "y": 12,
+        "w": 500,
+        "h": 40
+      }
+    },
+    {
+      "tag": "svg",
+      "cls": "[object SVGAnimatedString]",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(111, 119, 120)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "absolute",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 453,
+        "y": 24,
+        "w": 16,
+        "h": 16
+      }
+    },
+    {
+      "tag": "input",
+      "cls": "",
+      "text": "",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 479,
+        "y": 21,
+        "w": 390,
+        "h": 23
+      }
+    },
+    {
+      "tag": "a",
+      "cls": "search__browse",
+      "text": "Browse",
+      "bg": "rgba(34, 40, 42, 0.6)",
+      "color": "rgb(157, 164, 165)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "11px",
+      "fw": "600",
+      "radius": "4px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 869,
+        "y": 20,
+        "w": 62,
+        "h": 25
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "search__close",
+      "text": "",
+      "bg": "rgb(240, 240, 240)",
+      "color": "rgb(0, 0, 0)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13.3333px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "none",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0
+      }
+    },
+    {
+      "tag": "div",
+      "cls": "filter-group",
+      "text": "HotNew",
+      "bg": "rgb(42, 49, 52)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "4px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 775,
+        "y": 1226,
+        "w": 111,
+        "h": 34
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "filter-btn is-active",
+      "text": "Hot",
+      "bg": "rgb(50, 58, 62)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13px",
+      "fw": "500",
+      "radius": "4px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 778,
+        "y": 1229,
+        "w": 50,
+        "h": 28
+      }
+    },
+    {
+      "tag": "button",
+      "cls": "filter-btn ",
+      "text": "New",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(111, 119, 120)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "13px",
+      "fw": "500",
+      "radius": "4px",
+      "shadow": "none",
+      "display": "flex",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 828,
+        "y": 1229,
+        "w": 55,
+        "h": 28
+      }
+    }
+  ],
+  "footer": [
+    {
+      "tag": "footer",
+      "cls": "footer",
+      "text": "Manga and webtoons made simple — clean reader, fastest updates, always current.DiscoverTrending WebtoonTrending MangaBrowse allCommunityUpload RequestUpload RulesUnofficial DiscordComixContact UsInstall PWACredits© 2026 ",
+      "bg": "rgb(38, 45, 48)",
+      "color": "rgb(205, 213, 214)",
+      "font": "Geist, system-ui, -apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "fs": "14px",
+      "fw": "400",
+      "radius": "0px",
+      "shadow": "none",
+      "display": "block",
+      "pos": "static",
+      "gap": "normal",
+      "gridCols": "none",
+      "rect": {
+        "x": 0,
+        "y": 4078,
+        "w": 1440,
+        "h": 318
+      }
+    }
+  ],
+  "headings": [
+    {
+      "tag": "h3",
+      "text": "ANNOUNCEMENTS",
+      "cls": "announce__title mono"
+    },
+    {
+      "tag": "h2",
+      "text": "Most Recent Popular",
+      "cls": "section__title"
+    },
+    {
+      "tag": "h2",
+      "text": "Most Follows · New Comics",
+      "cls": "section__title"
+    },
+    {
+      "tag": "h2",
+      "text": "Latest Updates",
+      "cls": "section__title"
+    },
+    {
+      "tag": "h2",
+      "text": "User Collections",
+      "cls": "section__title"
+    }
+  ],
+  "links": [
+    {
+      "text": "",
+      "href": "/",
+      "cls": "logo"
+    },
+    {
+      "text": "Browse",
+      "href": "/browse",
+      "cls": "search__browse"
+    },
+    {
+      "text": "upload request",
+      "href": "/upload-request",
+      "cls": "announce__link"
+    },
+    {
+      "text": "Ch.72.86h agoAnyone Can Beat the Original",
+      "href": "/title/l7re-anyone-can-beat-the-original",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.715d agoThe Chick-Class Hunter is Filial!",
+      "href": "/title/n8we-the-chick-class-hunter-is-filial",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.366d agoThe Circumstances of Being Chosen as the Villainess's Favorite",
+      "href": "/title/7lz5e-the-circumstances-of-being-chosen-as-the-villainesss-favorite",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.591h agoBarbarian's Adventure in a Fantasy World",
+      "href": "/title/gxgm9-barbarians-adventure-in-a-fantasy-world",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.4817h agoOur Guild's Idol",
+      "href": "/title/e9l8-our-guilds-idol",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.604d agoThe Reason Why That Villainess Picked Up A Sword",
+      "href": "/title/55kym-the-reason-why-that-villainess-picked-up-a-sword",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.774d agoDo All Mothers in Childcare Novels have to Die?",
+      "href": "/title/2vm5-do-all-mothers-in-childcare-novels-have-to-die",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.415d agoThe Crown I Will Seize",
+      "href": "/title/n93ny-the-crown-i-will-seize",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.311d agoHow to Get on the Main Character's Flower Path",
+      "href": "/title/v2600-how-to-get-on-the-main-characters-flower-path",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.486d agoGrand Duchess's Constitution",
+      "href": "/title/lgd8e-grand-duchesss-constitution",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.346d agoMy Possession Became a Ghost Story",
+      "href": "/title/80d0m-my-possession-became-a-ghost-story",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.496d agoS-Class Hunter Heals with Monsters",
+      "href": "/title/z8em-s-class-hunter-heals-with-monsters",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.555d agoI Became the Genius Bastard of a Noble Dark Clan",
+      "href": "/title/qk31-i-became-the-genius-bastard-of-a-noble-dark-clan",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.264d agoI Faked a Pregnancy, but My Husband Returned",
+      "href": "/title/vw9zy-i-faked-a-pregnancy-but-my-husband-returned",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.274d agoThe Peaceful Life Of A Maid Who Hides Her Power And Enjoys It",
+      "href": "/title/mrj7e-the-peaceful-life-of-a-maid-who-hides-her-power-and-enjoys-it",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.234d agoBunker Days",
+      "href": "/title/q9gjd-bunker-days",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.454d agoAlmighty Pig Slaughtering Knife",
+      "href": "/title/9wz0j-almighty-pig-slaughtering-knife",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.492d agoNight Journey",
+      "href": "/title/936j-night-journey",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.564d agoI Became The Villain The Hero Is Obsessed With",
+      "href": "/title/e05zm-i-became-the-villain-the-hero-is-obsessed-with",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.314d agoThe Hashtag is First Love",
+      "href": "/title/9dxdj-the-hashtag-is-first-love",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.593d agoI'm Ready for Divorce!",
+      "href": "/title/39w9g-im-ready-for-divorce",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.316d agoMy Meddler in Love",
+      "href": "/title/jx9n3-my-meddler-in-love",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.254d agoThe Villainess Directs a Romance Fantasy",
+      "href": "/title/j61w3-the-villainess-directs-a-romance-fantasy",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.575d agoMy Dream is to Get My Own House",
+      "href": "/title/5r7m-my-dream-is-to-get-my-own-house",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.234d agoThe Forgotten Field",
+      "href": "/title/mr3m0-the-forgotten-field",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.4012h agoFog Land",
+      "href": "/title/lgkg7-fog-land",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.956d agoFull-Time Awakening",
+      "href": "/title/qqwrm-full-time-awakening",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.536d agoCreating Hidden Endings",
+      "href": "/title/lldl2-creating-hidden-endings",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.505d agoWelcome to the Rose Mansion",
+      "href": "/title/r17v-welcome-to-the-rose-mansion",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.501mo agoNoble in Name, Vulgar at Heart",
+      "href": "/title/l7ym7-noble-in-name-vulgar-at-heart",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.761d agoFather, I Won't Do Anything",
+      "href": "/title/qd2n9-father-i-wont-do-anything",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.43.89h agoI Got Engaged To The Blind Duke",
+      "href": "/title/xqz07-i-got-engaged-to-the-blind-duke",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.683d agoVillain, I'll Do Everything Except Marriage for You!",
+      "href": "/title/13ml-villain-ill-do-everything-except-marriage-for-you",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.691h agoI Became the Youngest Sister-in-law of the Ruined Reverse Harem's Mal",
+      "href": "/title/d6v8-i-became-the-youngest-sister-in-law-of-the-ruined-reverse-harems-male-leads",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.426d agoThe Youngest Has Many Secrets",
+      "href": "/title/3rq32-the-youngest-has-many-secrets",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.372d agoRaising Villains the Right Way",
+      "href": "/title/nk9re-raising-villains-the-right-way",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.651w agoMale Lead Is Obsessed With My Health",
+      "href": "/title/793e-male-lead-is-obsessed-with-my-health",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.331w agoFor Your Perfect Ending",
+      "href": "/title/0m05n-for-your-perfect-ending",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.5423h agoThe Villain Wants to Live",
+      "href": "/title/n7ee-the-villain-wants-to-live",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.958h agoInfinite Evolution Starting from Zero",
+      "href": "/title/rd7d1-infinite-evolution-starting-from-zero",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.262d agoI Was Thrown Into an Unknown Manga",
+      "href": "/title/vwnry-i-was-thrown-into-an-unknown-manga",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.134d agoI Only Need the Duke's Child",
+      "href": "/title/vw2lq-i-only-need-the-dukes-child",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.674d agoStand-In Bride: The Time-Limited Duchess",
+      "href": "/title/02l7v-stand-in-bride-the-time-limited-duchess",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.724d agoReturn of the Apocalypse-Class Death Knight",
+      "href": "/title/6exl0-return-of-the-apocalypse-class-death-knight",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.532d agoThe Flower with a Sword",
+      "href": "/title/nr83-the-flower-with-a-sword",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.694d agoThe Father and the Daughter",
+      "href": "/title/w0wm8-the-father-and-the-daughter",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.506d agoI Will Pay the Price for Deceiving You With My Life",
+      "href": "/title/ll172-i-will-pay-the-price-for-deceiving-you-with-my-life",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.516d agoReincarnated Streamer",
+      "href": "/title/3r7n0-reincarnated-streamer",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.29.23d agoHaimiya-senpai wa Kowakute Kawaii",
+      "href": "/title/n9vgy-haimiya-senpai-wa-kowakute-kawaii",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.172d agoSleepless Death",
+      "href": "/title/9l3kj-sleepless-death",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.201h agoThe Eldest Daughter of the Tang Clan of Sacheon Protects the Family",
+      "href": "/title/j6g5d-the-eldest-daughter-of-the-tang-clan-of-sacheon-protects-the-family",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.311d agoHow to Get on the Main Character's Flower Path",
+      "href": "/title/v2600-how-to-get-on-the-main-characters-flower-path",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.5423h agoThe Villain Wants to Live",
+      "href": "/title/n7ee-the-villain-wants-to-live",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.2323h agoThe White Tiger Clan's Baby Cotton Ball",
+      "href": "/title/e1lk8-the-white-tiger-clans-baby-cotton-ball",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.715d agoThe Chick-Class Hunter is Filial!",
+      "href": "/title/n8we-the-chick-class-hunter-is-filial",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.16d agoUnbeknownst to Me, I am Secretly Dating the Emperor",
+      "href": "/title/zgk6j-unbeknownst-to-me-i-am-secretly-dating-the-emperor",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.72.86h agoAnyone Can Beat the Original",
+      "href": "/title/l7re-anyone-can-beat-the-original",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.366d agoThe Circumstances of Being Chosen as the Villainess's Favorite",
+      "href": "/title/7lz5e-the-circumstances-of-being-chosen-as-the-villainesss-favorite",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.4817h agoOur Guild's Idol",
+      "href": "/title/e9l8-our-guilds-idol",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.111d agoI Became A Married Man in Another World",
+      "href": "/title/zgj83-i-became-a-married-man-in-another-world",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.61d agoThe Seventh Prince Escapes His Uncertain Fate",
+      "href": "/title/7l970-the-seventh-prince-escapes-his-uncertain-fate",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.192d agoWhen My Pet Became the Villain",
+      "href": "/title/w3nm9-when-my-pet-became-the-villain",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.43.89h agoI Got Engaged To The Blind Duke",
+      "href": "/title/xqz07-i-got-engaged-to-the-blind-duke",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.4012h agoFog Land",
+      "href": "/title/lgkg7-fog-land",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.372d agoRaising Villains the Right Way",
+      "href": "/title/nk9re-raising-villains-the-right-way",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.4319h agoCan I Cry Now?",
+      "href": "/title/q9wkd-can-i-cry-now",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.691d agoThe Snow Leopard Baby of the Black Leopard Family",
+      "href": "/title/lw2j-the-snow-leopard-baby-of-the-black-leopard-family",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.301mo agoTransmigrated as the Alpha Boss' Golden Goose",
+      "href": "/title/yg5r-transmigrated-as-the-alpha-boss-golden-goose",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.6020h agoI Became a Wretched Extra In a Healing Story",
+      "href": "/title/8wq9e-i-became-a-wretched-extra-in-a-healing-story",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.511d agoThe Rogue Producer Survives as an Idol",
+      "href": "/title/d7r3-the-rogue-producer-survives-as-an-idol",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.212d agoThe Search for the Duchess's Husband",
+      "href": "/title/nzrwe-the-search-for-the-duchesss-husband",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.161d agoThe Scandal Maker Has Returned",
+      "href": "/title/e1wlg-the-scandal-maker-has-returned",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.234d agoThe Forgotten Field",
+      "href": "/title/mr3m0-the-forgotten-field",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.346d agoMy Possession Became a Ghost Story",
+      "href": "/title/80d0m-my-possession-became-a-ghost-story",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.486d agoGrand Duchess's Constitution",
+      "href": "/title/lgd8e-grand-duchesss-constitution",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.183d agoThe Obsessive Male Leads Are Trying to Devour Me",
+      "href": "/title/l2nwv-the-obsessive-male-leads-are-trying-to-devour-me",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.604d agoThe Reason Why That Villainess Picked Up A Sword",
+      "href": "/title/55kym-the-reason-why-that-villainess-picked-up-a-sword",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.532d agoThe Flower with a Sword",
+      "href": "/title/nr83-the-flower-with-a-sword",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.7022h agoThe Yellow-Haired Villain in the Female Main Character's Novel Wants",
+      "href": "/title/70732-the-yellow-haired-villain-in-the-female-main-characters-novel-wants-happiness",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.274d agoThe Peaceful Life Of A Maid Who Hides Her Power And Enjoys It",
+      "href": "/title/mrj7e-the-peaceful-life-of-a-maid-who-hides-her-power-and-enjoys-it",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.134d agoI Only Need the Duke's Child",
+      "href": "/title/vw2lq-i-only-need-the-dukes-child",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.514h agoRoommate I Don't Know About",
+      "href": "/title/7l9gg-roommate-i-dont-know-about",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.321d agoThe Demon King Overrun by Heroes",
+      "href": "/title/l9vj2-the-demon-king-overrun-by-heroes",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.415d agoThe Crown I Will Seize",
+      "href": "/title/n93ny-the-crown-i-will-seize",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.172d agoSleepless Death",
+      "href": "/title/9l3kj-sleepless-death",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.234d agoBunker Days",
+      "href": "/title/q9gjd-bunker-days",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.691d agoWhat a Bountiful Harvest, Demon Lord!",
+      "href": "/title/7n3xg-what-a-bountiful-harvest-demon-lord",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.31d agoBecoming Necromancer God Through a Skeleton Clone",
+      "href": "/title/vwj25-becoming-necromancer-god-through-a-skeleton-clone",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.774d agoDo All Mothers in Childcare Novels have to Die?",
+      "href": "/title/2vm5-do-all-mothers-in-childcare-novels-have-to-die",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.761d agoFather, I Won't Do Anything",
+      "href": "/title/qd2n9-father-i-wont-do-anything",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.291d agoOsoraku Kanojo wa Ore no Aniki wo Neratteru",
+      "href": "/title/x5k7-osoraku-kanojo-wa-ore-no-aniki-wo-neratteru",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.264d agoI Faked a Pregnancy, but My Husband Returned",
+      "href": "/title/vw9zy-i-faked-a-pregnancy-but-my-husband-returned",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.602d agoThe Baby Fairy is a Villain",
+      "href": "/title/0vel-the-baby-fairy-is-a-villain",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.262d agoI Was Thrown Into an Unknown Manga",
+      "href": "/title/vwnry-i-was-thrown-into-an-unknown-manga",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.603h agoMoral-less Scandal",
+      "href": "/title/2l25-moral-less-scandal",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.591h agoBarbarian's Adventure in a Fantasy World",
+      "href": "/title/gxgm9-barbarians-adventure-in-a-fantasy-world",
+      "cls": "card"
+    },
+    {
+      "text": "Ch.362mos agoA Wicked Husband",
+      "href": "/title/yvkww-a-wicked-husband",
+      "cls": "card"
+    }
+  ],
+  "classFreq": [
+    [
+      "[object",
+      322
+    ],
+    [
+      "SVGAnimatedString]",
+      322
+    ],
+    [
+      "poster",
+      154
+    ],
+    [
+      "card",
+      140
+    ],
+    [
+      "card__poster-wrap",
+      140
+    ],
+    [
+      "poster--md",
+      140
+    ],
+    [
+      "card__body",
+      140
+    ],
+    [
+      "card__meta",
+      140
+    ],
+    [
+      "card__ch",
+      140
+    ],
+    [
+      "card__time",
+      140
+    ],
+    [
+      "card__title",
+      140
+    ],
+    [
+      "card__menu",
+      130
+    ],
+    [
+      "card__action",
+      130
+    ],
+    [
+      "card__action--menu",
+      130
+    ],
+    [
+      "swiper-slide",
+      110
+    ],
+    [
+      "card__rank-slot",
+      100
+    ],
+    [
+      "card__rank",
+      100
+    ],
+    [
+      "card__rank--double",
+      82
+    ],
+    [
+      "mono",
+      12
+    ],
+    [
+      "nav-btn",
+      11
+    ],
+    [
+      "hcoll-card",
+      10
+    ],
+    [
+      "hcoll-card__owner",
+      10
+    ],
+    [
+      "side-item",
+      10
+    ],
+    [
+      "side-item__poster",
+      10
+    ],
+    [
+      "poster--sm",
+      10
+    ],
+    [
+      "side-item__body",
+      10
+    ],
+    [
+      "side-item__kicker",
+      10
+    ],
+    [
+      "side-item__title",
+      10
+    ],
+    [
+      "side-item__meta",
+      10
+    ],
+    [
+      "side-item__time",
+      10
+    ],
+    [
+      "top-uploader",
+      10
+    ],
+    [
+      "top-uploader__rank",
+      10
+    ],
+    [
+      "top-uploader__avatar",
+      10
+    ],
+    [
+      "top-uploader__user",
+      10
+    ],
+    [
+      "top-uploader__count",
+      10
+    ],
+    [
+      "side-item__ch",
+      9
+    ],
+    [
+      "announce__item",
+      5
+    ],
+    [
+      "announce__text",
+      5
+    ],
+    [
+      "section",
+      4
+    ],
+    [
+      "section__header",
+      4
+    ],
+    [
+      "section__title-wrap",
+      4
+    ],
+    [
+      "section__title",
+      4
+    ],
+    [
+      "section__controls",
+      4
+    ],
+    [
+      "nav-btns",
+      4
+    ],
+    [
+      "is-active",
+      4
+    ],
+    [
+      "panel__tab-inline",
+      4
+    ],
+    [
+      "comment",
+      4
+    ],
+    [
+      "comment__poster",
+      4
+    ],
+    [
+      "poster--xs",
+      4
+    ],
+    [
+      "icon-btn",
+      3
+    ],
+    [
+      "nav-menu",
+      3
+    ],
+    [
+      "nav-btn--kebab",
+      3
+    ],
+    [
+      "swiper",
+      3
+    ],
+    [
+      "rail-swiper",
+      3
+    ],
+    [
+      "swiper-initialized",
+      3
+    ],
+    [
+      "swiper-horizontal",
+      3
+    ],
+    [
+      "swiper-wrapper",
+      3
+    ],
+    [
+      "swiper-slide-active",
+      3
+    ],
+    [
+      "swiper-slide-next",
+      3
+    ],
+    [
+      "panel",
+      3
+    ],
+    [
+      "panel--bare",
+      3
+    ],
+    [
+      "panel__tabs-inline",
+      3
+    ],
+    [
+      "top-uploader--medal",
+      3
+    ],
+    [
+      "comment__title",
+      3
+    ],
+    [
+      "comment__content",
+      3
+    ],
+    [
+      "comment__foot",
+      3
+    ],
+    [
+      "comment__user",
+      3
+    ],
+    [
+      "comment__time",
+      3
+    ],
+    [
+      "filter-btn",
+      2
+    ],
+    [
+      "pager__btn",
+      2
+    ],
+    [
+      "is-blurred",
+      2
+    ],
+    [
+      "pwa-banner",
+      2
+    ],
+    [
+      "pwa-banner__icon",
+      2
+    ],
+    [
+      "pwa-banner__body",
+      2
+    ],
+    [
+      "pwa-banner__title",
+      2
+    ],
+    [
+      "pwa-banner__sub",
+      2
+    ],
+    [
+      "pwa-banner__arrow",
+      2
+    ],
+    [
+      "topnav",
+      1
+    ],
+    [
+      "topnav__inner",
+      1
+    ],
+    [
+      "logo",
+      1
+    ],
+    [
+      "search",
+      1
+    ],
+    [
+      "search-toggle",
+      1
+    ],
+    [
+      "search__form",
+      1
+    ],
+    [
+      "search__browse",
+      1
+    ],
+    [
+      "search__close",
+      1
+    ],
+    [
+      "topnav__right",
+      1
+    ],
+    [
+      "settings",
+      1
+    ],
+    [
+      "browse",
+      1
+    ],
+    [
+      "login-btn",
+      1
+    ],
+    [
+      "layout",
+      1
+    ],
+    [
+      "layout--top",
+      1
+    ],
+    [
+      "main-col",
+      1
+    ],
+    [
+      "announce",
+      1
+    ],
+    [
+      "announce--accent",
+      1
+    ],
+    [
+      "announce__head",
+      1
+    ],
+    [
+      "announce__title",
+      1
+    ],
+    [
+      "announce__date",
+      1
+    ],
+    [
+      "announce__list",
+      1
+    ],
+    [
+      "announce__link",
+      1
+    ],
+    [
+      "filter-group",
+      1
+    ],
+    [
+      "grid-updates",
+      1
+    ],
+    [
+      "pager",
+      1
+    ],
+    [
+      "see-all",
+      1
+    ],
+    [
+      "hcoll-section__more",
+      1
+    ],
+    [
+      "swiper-backface-hidden",
+      1
+    ],
+    [
+      "side-col",
+      1
+    ],
+    [
+      "pwa-banner-group",
+      1
+    ],
+    [
+      "pwa-banner--discord",
+      1
+    ],
+    [
+      "panel__tab-sep",
+      1
+    ],
+    [
+      "panel__body",
+      1
+    ],
+    [
+      "side-list",
+      1
+    ],
+    [
+      "panel__foot",
+      1
+    ],
+    [
+      "view-more",
+      1
+    ],
+    [
+      "top-uploaders",
+      1
+    ],
+    [
+      "top-uploader--rank1",
+      1
+    ],
+    [
+      "top-uploader--rank2",
+      1
+    ],
+    [
+      "top-uploader--rank3",
+      1
+    ],
+    [
+      "comments",
+      1
+    ]
+  ]
+}

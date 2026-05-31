@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+web/node_modules/
+
+# Build outputs
+.next/
+web/.next/
+out/
+dist/
+build/
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go/Python caches
+*.test
+coverage.out
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local runtime data
+api/uploads/
+uploads/
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs and temp files
+*.log
+tmp/
+temp/
+.DS_Store
+Thumbs.db
+
+# Local-only agent/project state
+LOCAL_AI_CONTEXT.md
+web/.git.backup/

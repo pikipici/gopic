@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1280">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#312e81"/><stop offset="1" stop-color="#020617"/></linearGradient></defs>
+  <rect width="900" height="1280" fill="url(#g)"/>
+  <rect x="70" y="70" width="760" height="1140" rx="40" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="8"/>
+  <circle cx="690" cy="230" r="110" fill="#bef264" opacity=".7"/>
+  <path d="M120 920 C260 740 390 770 520 610 C620 488 720 420 805 370 V1210 H120 Z" fill="rgba(0,0,0,.38)"/>
+  <text x="90" y="170" fill="white" font-family="Arial" font-size="44" font-weight="900">NIGHTHAWK</text>
+  <text x="90" y="236" fill="rgba(255,255,255,.72)" font-family="Arial" font-size="32" font-weight="700">Chapter 003 · Page 3</text>
+  <text x="450" y="690" text-anchor="middle" fill="white" font-family="Arial" font-size="118" font-weight="900">3</text>
+</svg>
