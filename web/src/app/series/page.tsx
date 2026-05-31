@@ -16,7 +16,7 @@ export default async function SeriesIndexPage() {
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-lime-300">Catalog</p>
           <h1 className="mt-3 text-4xl font-black text-white sm:text-5xl">Semua series</h1>
           <p className="mt-4 max-w-2xl text-zinc-400">
-            Search dan filter jalan di seed data dulu. Nanti shape yang sama tinggal diganti API client Go.
+            Katalog live dari API lokal: hasil import KomikCast, KomikIndo, dan mock source tampil di satu tempat.
           </p>
         </div>
         <div className="rounded-3xl border border-white/10 bg-black/20 px-5 py-4 text-sm text-zinc-400">

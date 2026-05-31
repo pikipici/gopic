@@ -8,7 +8,7 @@ import type { ChapterSummary, SeriesDetail } from "@/lib/types";
 
 export function ChapterList({ series }: { series: SeriesDetail }) {
   const latestProgress = useMemo(() => getLatestSeriesProgress(series.slug), [series.slug]);
-  const latest = series.chapters[0];
+  const latest = series.chapters.find((chapter) => chapter.pageCount > 0);
   const resumeChapter = latestProgress ?? (latest ? { chapterSlug: latest.slug, pageNumber: 1, totalPages: latest.pageCount, read: false } : null);
 
   return (
@@ -32,12 +32,27 @@ export function ChapterList({ series }: { series: SeriesDetail }) {
 
 function ChapterRow({ seriesSlug, chapter }: { seriesSlug: string; chapter: ChapterSummary }) {
   const progress = getChapterProgress(seriesSlug, chapter.slug);
-  const progressLabel = progress?.read ? "Read" : progress ? `Page ${progress.pageNumber}/${progress.totalPages}` : "Unread";
-  const progressClass = progress?.read
-    ? "border-lime-300/30 bg-lime-300/10 text-lime-200"
-    : progress
-      ? "border-sky-300/30 bg-sky-300/10 text-sky-200"
-      : "border-white/10 bg-white/[0.03] text-zinc-500";
+  const hasPages = chapter.pageCount > 0;
+  const progressLabel = !hasPages ? "No pages" : progress?.read ? "Read" : progress ? `Page ${progress.pageNumber}/${progress.totalPages}` : "Unread";
+  const progressClass = !hasPages
+    ? "border-amber-200/25 bg-amber-200/10 text-amber-100"
+    : progress?.read
+      ? "border-lime-300/30 bg-lime-300/10 text-lime-200"
+      : progress
+        ? "border-sky-300/30 bg-sky-300/10 text-sky-200"
+        : "border-white/10 bg-white/[0.03] text-zinc-500";
+
+  if (!hasPages) {
+    return (
+      <div className="flex flex-col gap-3 py-4 opacity-80 sm:flex-row sm:items-center sm:justify-between">
+        <span>
+          <span className="block font-semibold text-white">{chapter.numberLabel} · {chapter.title || "Untitled chapter"}</span>
+          <span className="mt-1 block text-sm text-zinc-500">{formatDate(chapter.publishedAt)}</span>
+        </span>
+        <span className={`w-fit rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] ${progressClass}`}>{progressLabel}</span>
+      </div>
+    );
+  }
 
   return (
     <Link
@@ -45,7 +60,7 @@ function ChapterRow({ seriesSlug, chapter }: { seriesSlug: string; chapter: Chap
       className="flex flex-col gap-3 py-4 transition hover:text-lime-200 sm:flex-row sm:items-center sm:justify-between"
     >
       <span>
-        <span className="block font-semibold text-white">{chapter.numberLabel} · {chapter.title}</span>
+        <span className="block font-semibold text-white">{chapter.numberLabel} · {chapter.title || "Untitled chapter"}</span>
         <span className="mt-1 block text-sm text-zinc-500">{formatDate(chapter.publishedAt)}</span>
       </span>
       <span className={`w-fit rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] ${progressClass}`}>{progressLabel}</span>

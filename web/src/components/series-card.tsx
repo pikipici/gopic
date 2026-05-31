@@ -2,8 +2,16 @@ import Link from "next/link";
 import type { SeriesSummary } from "@/lib/types";
 import { formatDate, titleCase } from "@/lib/format";
 
+function sourceLabel(sourceId?: string) {
+  if (sourceId === "komikcast") return "KomikCast";
+  if (sourceId === "komikindo") return "KomikIndo";
+  if (sourceId === "mock-mihon") return "Mock";
+  return "Seed";
+}
+
 export function SeriesCard({ series }: { series: SeriesSummary }) {
   const latest = series.latestChapter;
+  const hasPages = latest ? latest.pageCount > 0 : false;
 
   return (
     <article className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] shadow-2xl shadow-black/20 transition hover:-translate-y-1 hover:border-lime-300/40 hover:bg-white/[0.07]">
@@ -13,6 +21,9 @@ export function SeriesCard({ series }: { series: SeriesSummary }) {
             className="absolute inset-0 opacity-90 transition duration-500 group-hover:scale-105"
             style={{ backgroundImage: `url(${series.coverUrl})`, backgroundSize: "cover" }}
           />
+          <div className="absolute left-3 top-3 rounded-full border border-white/15 bg-black/60 px-3 py-1 text-xs font-black text-white backdrop-blur">
+            {sourceLabel(series.sourceId)}
+          </div>
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-300">
               {titleCase(series.type)} · {titleCase(series.status)} · {series.chapterCount} ch
@@ -31,13 +42,19 @@ export function SeriesCard({ series }: { series: SeriesSummary }) {
           ))}
         </div>
         {latest ? (
-          <Link
-            href={`/series/${series.slug}/${latest.slug}`}
-            className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-3 py-3 text-sm transition hover:border-lime-300/50 hover:text-lime-200"
-          >
-            <span>{latest.numberLabel}</span>
-            <span className="text-xs text-zinc-500">{formatDate(latest.publishedAt)}</span>
-          </Link>
+          hasPages ? (
+            <Link
+              href={`/series/${series.slug}/${latest.slug}`}
+              className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-3 py-3 text-sm transition hover:border-lime-300/50 hover:text-lime-200"
+            >
+              <span>{latest.numberLabel}</span>
+              <span className="text-xs text-zinc-500">{formatDate(latest.publishedAt)}</span>
+            </Link>
+          ) : (
+            <div className="rounded-2xl border border-amber-200/20 bg-amber-200/10 px-3 py-3 text-sm text-amber-100">
+              {latest.numberLabel} · pages belum tersedia
+            </div>
+          )
         ) : null}
       </div>
     </article>

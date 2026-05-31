@@ -126,7 +126,7 @@ export function CatalogBrowser({ seriesList, genres }: { seriesList: SeriesSumma
             </button>
           </div>
           <div className="flex items-end text-sm text-zinc-500 lg:justify-end">
-            {filtered.length} series ketemu dari {seriesList.length} seed entries.
+            {filtered.length} series ketemu dari {seriesList.length} catalog entries.
           </div>
         </div>
       </div>
