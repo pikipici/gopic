@@ -74,6 +74,15 @@ go run ./cmd/api
 
 See `../docs/source-service-contract.md` for the required endpoints and payload shapes. A runnable local sample lives at `../tools/source_service_mock.py`, and the automated smoke is `../tools/smoke_json_source.sh`.
 
+To register multiple external JSON sources at once, set `SOURCES_JSON`:
+
+```bash
+SOURCES_JSON='[{"id":"komikcast","name":"Komik Cast","url":"http://localhost:19190"},{"id":"komikindo","name":"KomikIndo","url":"http://localhost:19191"}]' \
+go run ./cmd/api
+```
+
+`SOURCE_ID` / `SOURCE_NAME` / `SOURCE_URL` still work for a single legacy source and can be combined with `SOURCES_JSON`.
+
 ## Source Import Options
 
 Admin source imports accept safety options in the request body:

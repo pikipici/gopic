@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -17,6 +18,10 @@ import (
 	"gomic-api/internal/seed"
 	"gomic-api/internal/source"
 )
+
+func sourceIndex(idx int) string {
+	return strconv.Itoa(idx + 1)
+}
 
 func main() {
 	cfg := config.Load()
@@ -49,19 +54,27 @@ func main() {
 		slog.Info("using seed catalog repository")
 	}
 
-	sourceRegistry := source.NewRegistry(source.NewMockSource())
-	if cfg.SourceURL != "" {
-		sourceID := cfg.SourceID
+	registeredSources := []source.Source{source.NewMockSource()}
+	for idx, sourceConfig := range cfg.Sources {
+		sourceID := sourceConfig.ID
 		if sourceID == "" {
 			sourceID = "json-http"
+			if len(cfg.Sources) > 1 {
+				sourceID = "json-http-" + sourceIndex(idx)
+			}
 		}
-		sourceName := cfg.SourceName
+		sourceName := sourceConfig.Name
 		if sourceName == "" {
 			sourceName = "JSON HTTP Source"
 		}
-		sourceRegistry = source.NewRegistry(source.NewMockSource(), source.NewJSONHTTPSourceWithHeaders(sourceID, sourceName, cfg.SourceURL, cfg.SourceHeaders))
-		slog.Info("registered json http source", "id", sourceID, "url", cfg.SourceURL)
+		headers := sourceConfig.Headers
+		if headers == nil && sourceConfig.URL == cfg.SourceURL {
+			headers = cfg.SourceHeaders
+		}
+		registeredSources = append(registeredSources, source.NewJSONHTTPSourceWithHeaders(sourceID, sourceName, sourceConfig.URL, headers))
+		slog.Info("registered json http source", "id", sourceID, "url", sourceConfig.URL)
 	}
+	sourceRegistry := source.NewRegistry(registeredSources...)
 
 	handler := httpapi.NewHandler(repo, httpapi.WithAdminToken(cfg.AdminToken), httpapi.WithUploadDir(cfg.UploadDir), httpapi.WithJobStore(jobStore), httpapi.WithSourceRegistry(sourceRegistry), httpapi.WithImageHeaders(cfg.ImageHeaders))
 
