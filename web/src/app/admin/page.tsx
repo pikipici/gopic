@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useMemo, useState } from "react";
+import { FormEvent, useCallback, useMemo, useRef, useState } from "react";
 import type { ChapterPage, ChapterSummary, SeriesSummary } from "@/lib/types";
 
 type Envelope<T> = {
@@ -104,9 +104,11 @@ export default function AdminPage() {
   const [message, setMessage] = useState("Masuk pakai ADMIN_TOKEN untuk mulai.");
   const [busy, setBusy] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const nextToastID = useRef(0);
 
   const pushToast = (toast: Omit<Toast, "id">) => {
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    nextToastID.current += 1;
+    const id = `toast-${nextToastID.current}`;
     setToasts((current) => [...current, { ...toast, id }]);
     window.setTimeout(() => {
       setToasts((current) => current.filter((item) => item.id !== id));
@@ -191,12 +193,18 @@ export default function AdminPage() {
 
   async function handleSourcePreview(result: SourceResult) {
     setBusy(true);
+    setSourcePreview(null);
+    setMessage(`Loading preview: ${result.title}...`);
     try {
       const detail = await adminFetch<SourceDetail>(`/api/v1/admin/sources/${result.sourceId}/series/${result.id}`, savedToken);
       setSourcePreview(detail);
       setMessage(`Preview loaded: ${detail.title}.`);
+      pushToast({ tone: "success", title: "Preview loaded", message: `${detail.title} (${detail.chapterCount} chapter)` });
+      window.requestAnimationFrame(() => document.getElementById("source-preview-card")?.scrollIntoView({ behavior: "smooth", block: "center" }));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Gagal load preview source.");
+      const errorMessage = error instanceof Error ? error.message : "Gagal load preview source.";
+      setMessage(errorMessage);
+      pushToast({ tone: "error", title: "Preview failed", message: errorMessage });
     } finally {
       setBusy(false);
     }
@@ -519,7 +527,7 @@ export default function AdminPage() {
           ))}
         </div>
         {sourcePreview ? (
-          <article className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-black/25 p-4 shadow-xl shadow-black/20 md:grid-cols-[96px_1fr] xl:grid-cols-[96px_1fr_320px]">
+          <article id="source-preview-card" className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-black/25 p-4 shadow-xl shadow-black/20 md:grid-cols-[96px_1fr] xl:grid-cols-[96px_1fr_320px]">
             <img src={sourcePreview.coverUrl} alt="" width={96} height={136} className="h-[136px] w-24 rounded-2xl object-cover" />
             <div>
               <p className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-sky-200">Preview loaded</p>
