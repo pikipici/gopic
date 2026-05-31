@@ -38,6 +38,15 @@ function formatDate(value?: string) {
   return new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "short" }).format(date);
 }
 
+function formatJobType(type: string) {
+  return type.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function jobSeriesID(job: AdminJob | null) {
+  const value = job?.payload?.sourceSeriesId;
+  return typeof value === "string" ? value : "";
+}
+
 async function adminFetch<T>(path: string, token: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${apiBaseUrl}${path}`, {
     ...init,
@@ -318,6 +327,10 @@ export default function AdminPage() {
   const runningJobs = recentJobs.filter((job) => job.status === "queued" || job.status === "running").length;
   const failedJobs = recentJobs.filter((job) => job.status === "failed").length;
   const activeSourceName = sources.find((item) => item.id === activeSourceId)?.name ?? (activeSourceId || "No source");
+  const activeJobSeriesID = jobSeriesID(activeJob);
+  const activeJobLatestChapter = activeJobSeriesID ? series.find((item) => item.slug === activeJobSeriesID)?.latestChapter?.slug : undefined;
+  const activeJobDone = activeJob?.status === "completed" && activeJobSeriesID;
+  const activeJobRunning = activeJob?.status === "queued" || activeJob?.status === "running";
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
@@ -358,7 +371,7 @@ export default function AdminPage() {
 
       <div className={`rounded-3xl border p-4 text-sm ${busy ? "border-sky-200/25 bg-sky-200/[0.06] text-sky-100" : "border-white/10 bg-surface/80 text-muted"}`}>
         <div className="flex items-center justify-between gap-3">
-          <span>{busy ? "Loading..." : message}</span>
+          <span>{busy ? `Working... ${message}` : message}</span>
           <span className="hidden rounded-full border border-white/10 px-2 py-1 font-mono text-[0.65rem] text-muted sm:inline">{apiBaseUrl}</span>
         </div>
       </div>
@@ -368,7 +381,7 @@ export default function AdminPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-sky-200">Current job</p>
-              <h2 className="mt-1 font-black text-sky-50">{activeJob.type}</h2>
+              <h2 className="mt-1 font-black text-sky-50">{formatJobType(activeJob.type)}</h2>
             </div>
             <div className="flex items-center gap-2">
               <span className={`rounded-full px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.18em] ring-1 ${statusClass(activeJob.status)}`}>{activeJob.status}</span>
@@ -379,6 +392,23 @@ export default function AdminPage() {
             <div className="h-full rounded-full bg-sky-200 transition-all duration-500" style={{ width: `${activeJob.progress}%` }} />
           </div>
           <p className="mt-3 text-sm text-muted">{activeJob.message}</p>
+          {activeJobRunning ? (
+            <div className="mt-4 rounded-2xl border border-sky-200/20 bg-sky-200/10 p-3 text-sm font-semibold text-sky-50">
+              Import masih diproses. Jangan refresh dulu; progress akan update otomatis.
+            </div>
+          ) : null}
+          {activeJobDone ? (
+            <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-lime-300/25 bg-lime-300/10 p-4 text-sm text-lime-50 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-black">Import berhasil: {activeJobSeriesID}</p>
+                <p className="mt-1 text-lime-100/80">Series sudah masuk katalog. Buka langsung untuk cek hasil import.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <a href={`/series/${activeJobSeriesID}`} className="rounded-full bg-lime-200 px-3 py-2 text-xs font-black text-black transition hover:scale-[1.02]">Open series</a>
+                {activeJobLatestChapter ? <a href={`/series/${activeJobSeriesID}/${activeJobLatestChapter}`} className="rounded-full border border-lime-200/40 px-3 py-2 text-xs font-black text-lime-50 transition hover:bg-lime-200 hover:text-black">Open latest chapter</a> : null}
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -397,7 +427,7 @@ export default function AdminPage() {
             <article key={job.id} className="rounded-2xl border border-white/10 bg-black/25 p-4 transition hover:border-white/20">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h3 className="truncate font-bold">{job.type.replace("_", " ")}</h3>
+                  <h3 className="truncate font-bold">{formatJobType(job.type)}</h3>
                   <p className="mt-1 truncate font-mono text-[0.7rem] text-muted">{job.id}</p>
                 </div>
                 <span className={`rounded-full px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.18em] ring-1 ${statusClass(job.status)}`}>{job.status}</span>
@@ -505,8 +535,9 @@ export default function AdminPage() {
               </label>
               {sourceNeedsLimit ? <p className="mt-3 rounded-2xl border border-amber-200/20 bg-amber-200/10 p-3 text-xs font-semibold text-amber-100">Seri ini besar. Isi chapter limit atau aktifkan metadata-only supaya import tidak terlalu lama.</p> : null}
               <button onClick={() => void handleSourceImport(sourcePreview)} disabled={!savedToken || busy || sourceNeedsLimit} className="mt-4 w-full rounded-2xl bg-accent px-5 py-3 font-black text-black transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50">
-                Queue import
+                {busy ? "Importing..." : "Queue import"}
               </button>
+              <p className="mt-2 text-xs text-muted">Setelah selesai, success panel akan muncul di Current job dengan link ke series dan latest chapter.</p>
             </div>
           </article>
         ) : null}
