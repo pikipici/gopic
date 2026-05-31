@@ -166,39 +166,50 @@ export function ReaderShell({
 
   return (
     <div className={`${backgroundClass[settings.background]} min-h-screen pb-24 transition-colors`}>
-      <div className="sticky top-[145px] z-20 mx-auto mb-4 max-w-5xl px-3 sm:top-[89px] sm:px-4">
-        <div className="flex flex-wrap items-center justify-center gap-2 rounded-3xl border border-white/10 bg-black/75 p-2 text-xs font-bold text-zinc-300 shadow-2xl shadow-black/30 backdrop-blur-xl">
-          <ToggleGroup
-            label="Width"
-            value={settings.width}
-            values={["compact", "comfort", "wide"]}
-            onChange={(value) => updateSettings("width", value as WidthMode)}
-          />
-          <ToggleGroup
-            label="Gap"
-            value={settings.gap}
-            values={["tight", "normal", "airy"]}
-            onChange={(value) => updateSettings("gap", value as GapMode)}
-          />
-          <ToggleGroup
-            label="BG"
-            value={settings.background}
-            values={["black", "charcoal", "paper"]}
-            onChange={(value) => updateSettings("background", value as BackgroundMode)}
-          />
+      <div className="sticky top-[145px] z-20 mx-auto mb-4 max-w-6xl px-3 sm:top-[89px] sm:px-4">
+        <div className="rounded-[1.75rem] border border-white/10 bg-black/80 p-2 shadow-2xl shadow-black/30 backdrop-blur-xl">
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/[0.05] px-3 py-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.22em] text-lime-300">Reader</span>
+              <span className="text-xs font-bold text-zinc-400">{pages.length} pages</span>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-zinc-300 lg:justify-end">
+              <ToggleGroup
+                label="Width"
+                value={settings.width}
+                values={["compact", "comfort", "wide"]}
+                onChange={(value) => updateSettings("width", value as WidthMode)}
+              />
+              <ToggleGroup
+                label="Gap"
+                value={settings.gap}
+                values={["tight", "normal", "airy"]}
+                onChange={(value) => updateSettings("gap", value as GapMode)}
+              />
+              <ToggleGroup
+                label="BG"
+                value={settings.background}
+                values={["black", "charcoal", "paper"]}
+                onChange={(value) => updateSettings("background", value as BackgroundMode)}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-0 py-1 sm:px-4">
-        <div className="mx-auto mb-4 max-w-3xl rounded-3xl border border-white/10 bg-black/55 p-4 text-center text-sm text-zinc-400">
-          Reader settings sekarang persist lokal. Progress page juga otomatis masuk Library.
+      <div className="mx-auto max-w-6xl px-0 py-1 sm:px-4">
+        <div className="mx-auto mb-4 max-w-3xl rounded-3xl border border-white/10 bg-black/55 p-4 text-center text-sm text-zinc-400 shadow-xl shadow-black/20">
+          Reader settings persist lokal. Progress page otomatis masuk Library.
         </div>
         {pages.map((page) => (
           <section
             key={page.pageNumber}
             data-reader-page={page.pageNumber}
-            className={`mx-auto ${widthClass[settings.width]} ${gapClass[settings.gap]} overflow-hidden bg-zinc-950 shadow-2xl shadow-black/40 sm:rounded-[1.75rem]`}
+            className={`group relative mx-auto ${widthClass[settings.width]} ${gapClass[settings.gap]} overflow-hidden bg-zinc-950 shadow-2xl shadow-black/40 sm:rounded-[1.75rem]`}
           >
+            <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full border border-white/10 bg-black/60 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-white opacity-0 backdrop-blur transition group-hover:opacity-100">
+              Page {page.pageNumber}/{pages.length}
+            </div>
             <ReaderPageImage page={page} />
           </section>
         ))}
@@ -221,7 +232,7 @@ function ToggleGroup({
 }) {
   return (
     <div className="flex items-center gap-1 rounded-2xl bg-white/[0.06] p-1">
-      <span className="px-2 text-[10px] uppercase tracking-[0.18em] text-zinc-500">{label}</span>
+      <span className="px-2 text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">{label}</span>
       {values.map((item) => (
         <button
           key={item}
