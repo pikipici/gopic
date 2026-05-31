@@ -378,14 +378,14 @@ export default function AdminPage() {
   const activeJobRunning = activeJob?.status === "queued" || activeJob?.status === "running";
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
-      <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(190,242,100,0.18),rgba(17,17,22,0.95)_42%,rgba(59,130,246,0.16))] p-6 shadow-2xl shadow-black/30 md:p-8">
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
+      <section className="overflow-hidden rounded-[2.25rem] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(190,242,100,0.24),transparent_34%),linear-gradient(135deg,rgba(17,17,22,0.96),rgba(7,7,10,0.94)_58%,rgba(59,130,246,0.18))] p-6 shadow-2xl shadow-black/30 md:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <p className="font-mono text-xs uppercase tracking-[0.4em] text-accent">Gomic cockpit</p>
             <h1 className="mt-4 text-4xl font-black tracking-tight md:text-6xl">Admin chapter forge</h1>
             <p className="mt-4 text-base text-muted md:text-lg">
-              Simpan chapter baru, lalu tempel daftar URL page. Semua route tetap dilindungi bearer token API.
+              Search source, preview metadata, queue import, retry failed jobs, dan raw chapter tools dalam satu cockpit.
             </p>
           </div>
           <form onSubmit={handleLogin} className="flex w-full flex-col gap-3 rounded-3xl border border-white/10 bg-black/30 p-4 lg:max-w-sm">
@@ -407,7 +407,7 @@ export default function AdminPage() {
         </div>
       </section>
 
-      <section className="grid gap-3 md:grid-cols-4">
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Series" value={String(series.length)} hint={`${linkedSeries} linked source`} />
         <StatCard label="Sources" value={String(sources.length)} hint={activeSourceName} />
         <StatCard label="Active jobs" value={String(runningJobs)} hint="queued / running" />
@@ -457,7 +457,7 @@ export default function AdminPage() {
         </div>
       ) : null}
 
-      <section className="rounded-[1.75rem] border border-white/10 bg-surface/80 p-5">
+      <section className="rounded-[1.75rem] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_34%),rgba(255,255,255,0.04)] p-5 shadow-xl shadow-black/20">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.35em] text-accent">Job history</p>
@@ -496,7 +496,7 @@ export default function AdminPage() {
         </div>
       </section>
 
-      <section className="rounded-[1.75rem] border border-sky-300/20 bg-sky-300/[0.06] p-5">
+      <section className="overflow-hidden rounded-[2rem] border border-sky-300/20 bg-[radial-gradient(circle_at_top_left,rgba(125,211,252,0.18),transparent_36%),rgba(56,189,248,0.06)] p-5 shadow-xl shadow-sky-950/20">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex flex-col gap-1">
             <p className="font-mono text-xs uppercase tracking-[0.35em] text-sky-200">Mihon bridge</p>
@@ -535,14 +535,14 @@ export default function AdminPage() {
         </form>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {sourceResults.map((result) => (
-            <article key={`${result.sourceId}-${result.id}`} className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/25 p-3 transition hover:border-sky-200/30">
+            <article key={`${result.sourceId}-${result.id}`} className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/25 p-3 transition hover:border-sky-200/30 sm:flex-row sm:items-center">
               <img src={result.coverUrl} alt="" width={56} height={80} className="h-20 w-14 rounded-xl object-cover" />
               <div className="min-w-0 flex-1">
                 <h3 className="truncate font-bold">{result.title}</h3>
                 <p className="mt-1 truncate text-xs text-muted">{result.sourceId} / {result.id}</p>
                 <p className="mt-2 inline-flex rounded-full bg-white/10 px-2 py-1 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-sky-100">Ready to preview</p>
               </div>
-              <button onClick={() => void handleSourcePreview(result)} disabled={!savedToken || busy} className="rounded-xl bg-white px-3 py-2 text-xs font-black text-black transition hover:bg-sky-200 disabled:opacity-50">
+              <button onClick={() => void handleSourcePreview(result)} disabled={!savedToken || busy} className="w-full rounded-xl bg-white px-3 py-2 text-xs font-black text-black transition hover:bg-sky-200 disabled:opacity-50 sm:w-auto">
                 Preview
               </button>
             </article>
