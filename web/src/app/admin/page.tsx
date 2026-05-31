@@ -63,8 +63,8 @@ function pagesFromText(value: string): ChapterPage[] {
 }
 
 export default function AdminPage() {
-  const [token, setToken] = useState(() => (typeof window === "undefined" ? "" : window.localStorage.getItem("gomic-admin-token") ?? ""));
-  const [savedToken, setSavedToken] = useState(() => (typeof window === "undefined" ? "" : window.localStorage.getItem("gomic-admin-token") ?? ""));
+  const [token, setToken] = useState("");
+  const [savedToken, setSavedToken] = useState("");
   const [series, setSeries] = useState<SeriesSummary[]>([]);
   const [sources, setSources] = useState<SourceSummary[]>([]);
   const [activeSourceId, setActiveSourceId] = useState("");
