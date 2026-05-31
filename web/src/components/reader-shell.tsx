@@ -100,6 +100,8 @@ function ReaderPageImage({ page }: ReaderPageImageProps) {
           Loading page {page.pageNumber}...
         </div>
       ) : null}
+      {/* Reader pages may be cached locally or served from arbitrary source hosts. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         key={retryKey}
         src={resolvedUrl}
