@@ -16,6 +16,14 @@ type ReaderSettings = {
 };
 
 const SETTINGS_KEY = "gomic:reader-settings:v1";
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "";
+
+function resolvePageImageUrl(imageUrl: string) {
+  if (imageUrl.startsWith("/uploads/") && apiBaseUrl) {
+    return `${apiBaseUrl}${imageUrl}`;
+  }
+  return imageUrl;
+}
 
 const defaultSettings: ReaderSettings = {
   width: "comfort",
@@ -115,15 +123,12 @@ export function ReaderShell({
             data-reader-page={page.pageNumber}
             className={`mx-auto ${widthClass[settings.width]} ${gapClass[settings.gap]} overflow-hidden bg-zinc-950 shadow-2xl shadow-black/40 sm:rounded-[1.75rem]`}
           >
-            <div
-              className="flex min-h-[82vh] items-center justify-center border border-white/5 bg-cover bg-center p-10 text-center"
-              style={{ backgroundImage: `url(${page.imageUrl})` }}
-            >
-              <div className="rounded-3xl border border-white/10 bg-black/70 px-8 py-6 shadow-2xl backdrop-blur-sm">
-                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-lime-300">Mock page</p>
-                <p className="mt-3 text-5xl font-black text-white">{page.pageNumber}</p>
-              </div>
-            </div>
+            <img
+              src={resolvePageImageUrl(page.imageUrl)}
+              alt={`Page ${page.pageNumber}`}
+              loading={page.pageNumber <= 2 ? "eager" : "lazy"}
+              className="block h-auto w-full border border-white/5 bg-zinc-950"
+            />
           </section>
         ))}
       </div>
