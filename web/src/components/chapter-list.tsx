@@ -13,15 +13,17 @@ export function ChapterList({ series }: { series: SeriesDetail }) {
 
   return (
     <>
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3">
         {resumeChapter ? (
-          <Link href={`/series/${series.slug}/${resumeChapter.chapterSlug}`} className="inline-flex rounded-full bg-lime-300 px-6 py-3 font-bold text-black transition hover:bg-lime-200">
+          <Link href={`/series/${series.slug}/${resumeChapter.chapterSlug}`} className="inline-flex rounded-full bg-lime-300 px-6 py-3 font-black text-black transition hover:bg-lime-200">
             {latestProgress ? `Lanjut page ${latestProgress.pageNumber}/${latestProgress.totalPages}` : `Baca ${latest?.numberLabel}`}
           </Link>
-        ) : null}
+        ) : (
+          <div className="rounded-full border border-amber-200/20 bg-amber-200/10 px-5 py-3 text-sm font-bold text-amber-100">Belum ada chapter yang siap dibaca.</div>
+        )}
       </div>
 
-      <div className="mt-5 divide-y divide-white/10">
+      <div className="mt-5 grid gap-3">
         {series.chapters.map((chapter) => (
           <ChapterRow key={chapter.slug} seriesSlug={series.slug} chapter={chapter} />
         ))}
@@ -41,29 +43,26 @@ function ChapterRow({ seriesSlug, chapter }: { seriesSlug: string; chapter: Chap
       : progress
         ? "border-sky-300/30 bg-sky-300/10 text-sky-200"
         : "border-white/10 bg-white/[0.03] text-zinc-500";
+  const rowClass = hasPages
+    ? "border-white/10 bg-black/25 hover:border-lime-300/40 hover:bg-lime-300/[0.06] hover:text-lime-100"
+    : "border-amber-200/15 bg-amber-200/[0.06] opacity-85";
+  const content = (
+    <>
+      <div>
+        <span className="block font-bold text-white">{chapter.numberLabel} / {chapter.title || "Untitled chapter"}</span>
+        <span className="mt-1 block text-sm text-zinc-500">{formatDate(chapter.publishedAt)} / {chapter.pageCount} pages</span>
+      </div>
+      <span className={`w-fit rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.16em] ${progressClass}`}>{progressLabel}</span>
+    </>
+  );
 
   if (!hasPages) {
-    return (
-      <div className="flex flex-col gap-3 py-4 opacity-80 sm:flex-row sm:items-center sm:justify-between">
-        <span>
-          <span className="block font-semibold text-white">{chapter.numberLabel} · {chapter.title || "Untitled chapter"}</span>
-          <span className="mt-1 block text-sm text-zinc-500">{formatDate(chapter.publishedAt)}</span>
-        </span>
-        <span className={`w-fit rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] ${progressClass}`}>{progressLabel}</span>
-      </div>
-    );
+    return <div className={`flex flex-col gap-3 rounded-2xl border px-4 py-4 sm:flex-row sm:items-center sm:justify-between ${rowClass}`}>{content}</div>;
   }
 
   return (
-    <Link
-      href={`/series/${seriesSlug}/${chapter.slug}`}
-      className="flex flex-col gap-3 py-4 transition hover:text-lime-200 sm:flex-row sm:items-center sm:justify-between"
-    >
-      <span>
-        <span className="block font-semibold text-white">{chapter.numberLabel} · {chapter.title || "Untitled chapter"}</span>
-        <span className="mt-1 block text-sm text-zinc-500">{formatDate(chapter.publishedAt)}</span>
-      </span>
-      <span className={`w-fit rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] ${progressClass}`}>{progressLabel}</span>
+    <Link href={`/series/${seriesSlug}/${chapter.slug}`} className={`flex flex-col gap-3 rounded-2xl border px-4 py-4 transition sm:flex-row sm:items-center sm:justify-between ${rowClass}`}>
+      {content}
     </Link>
   );
 }
