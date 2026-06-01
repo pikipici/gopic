@@ -30,13 +30,13 @@ export default async function Home() {
           <div className="space-y-3">
             {heroSeries ? <HeroFeature series={heroSeries} /> : <EmptyHero />}
 
+            <ContinueReadingCard seriesList={allSeries} />
+
             <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
               {trending.slice(0, 6).map((series, index) => (
                 <MiniPoster key={series.slug} series={series} index={index + 1} />
               ))}
             </div>
-
-            <ContinueReadingCard seriesList={allSeries} />
           </div>
 
           <aside className="space-y-3">
