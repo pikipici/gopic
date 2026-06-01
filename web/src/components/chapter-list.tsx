@@ -14,18 +14,18 @@ export function ChapterList({ series }: { series: SeriesDetail }) {
 
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[1.5rem] border border-white/10 bg-black/25 p-3 sm:p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-black/25 p-3">
         {resumeChapter ? (
-          <Link href={`/series/${series.slug}/${resumeChapter.chapterSlug}`} className="inline-flex rounded-full bg-lime-300 px-5 py-3 text-sm font-black text-black transition hover:bg-lime-200">
+          <Link href={`/series/${series.slug}/${resumeChapter.chapterSlug}`} className="inline-flex rounded-md bg-lime-300 px-4 py-2.5 text-sm font-black text-black transition hover:bg-lime-200">
             {latestProgress ? `Lanjut page ${latestProgress.pageNumber}/${latestProgress.totalPages}` : `Baca ${latest?.numberLabel}`}
           </Link>
         ) : (
-          <div className="rounded-full border border-amber-200/20 bg-amber-200/10 px-5 py-3 text-sm font-bold text-amber-100">Belum ada chapter yang siap dibaca.</div>
+          <div className="rounded-md border border-amber-200/20 bg-amber-200/10 px-4 py-2.5 text-sm font-bold text-amber-100">Belum ada chapter yang siap dibaca.</div>
         )}
         <span className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">{readyCount} ready / {series.chapters.length} total</span>
       </div>
 
-      <div className="mt-5 grid gap-2">
+      <div className="mt-4 grid gap-1.5">
         {series.chapters.map((chapter) => (
           <ChapterRow key={chapter.slug} seriesSlug={series.slug} chapter={chapter} />
         ))}
@@ -51,24 +51,24 @@ function ChapterRow({ seriesSlug, chapter }: { seriesSlug: string; chapter: Chap
   const content = (
     <>
       <div className="flex min-w-0 flex-1 items-start gap-3">
-        <span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-xs font-black ${hasPages ? "bg-lime-300/10 text-lime-200 ring-1 ring-lime-300/20" : "bg-amber-200/10 text-amber-100 ring-1 ring-amber-200/20"}`}>
+        <span className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-black ${hasPages ? "bg-lime-300/10 text-lime-200 ring-1 ring-lime-300/20" : "bg-amber-200/10 text-amber-100 ring-1 ring-amber-200/20"}`}>
           {chapter.numberSort || "?"}
         </span>
         <span className="min-w-0">
-          <span className="block truncate font-bold text-white">{chapter.numberLabel} / {chapter.title || "Untitled chapter"}</span>
+          <span className="block truncate text-sm font-bold text-white">{chapter.numberLabel} / {chapter.title || "Untitled chapter"}</span>
           <span className="mt-1 block text-sm text-zinc-500">{formatDate(chapter.publishedAt)} / {chapter.pageCount} pages</span>
         </span>
       </div>
-      <span className={`w-fit shrink-0 rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.16em] ${progressClass}`}>{progressLabel}</span>
+      <span className={`w-fit shrink-0 rounded-md border px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] ${progressClass}`}>{progressLabel}</span>
     </>
   );
 
   if (!hasPages) {
-    return <div className={`flex flex-col gap-3 rounded-2xl border px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4 ${rowClass}`}>{content}</div>;
+    return <div className={`flex flex-col gap-3 rounded-lg border px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between ${rowClass}`}>{content}</div>;
   }
 
   return (
-    <Link href={`/series/${seriesSlug}/${chapter.slug}`} className={`flex flex-col gap-3 rounded-2xl border px-3 py-3 transition sm:flex-row sm:items-center sm:justify-between sm:px-4 ${rowClass}`}>
+    <Link href={`/series/${seriesSlug}/${chapter.slug}`} className={`flex flex-col gap-3 rounded-lg border px-3 py-2.5 transition sm:flex-row sm:items-center sm:justify-between ${rowClass}`}>
       {content}
     </Link>
   );

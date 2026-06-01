@@ -201,18 +201,18 @@ export function ReaderShell({
 
   return (
     <div className={`${backgroundClass[settings.background]} min-h-screen pb-10 transition-colors`}>
-      <div className="sticky top-0 z-30 border-b border-white/10 bg-black/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-3 py-3 sm:px-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="sticky top-0 z-30 border-b border-white/10 bg-black/92 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-3 py-2.5 sm:px-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <Link href={detailHref} className="text-xs font-black uppercase tracking-[0.2em] text-lime-300 hover:text-lime-200">
               Back to series
             </Link>
-            <h1 className="mt-1 truncate text-base font-black text-white sm:text-lg">{seriesTitle}</h1>
+            <h1 className="mt-0.5 truncate text-base font-black text-white">{seriesTitle}</h1>
             <p className="truncate text-xs text-zinc-500">{chapterLabel} / {chapterTitle || "Untitled chapter"} / {pages.length} pages</p>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-sm font-black">
             <ReaderNavLink href={previousHref} label={previousLabel ? `Prev ${previousLabel}` : "Prev"} />
-            <Link href={detailHref} className="rounded-full border border-white/10 px-4 py-2 text-zinc-200 transition hover:bg-white/10">
+             <Link href={detailHref} className="rounded-md border border-white/10 px-3 py-2 text-zinc-200 transition hover:bg-white/10">
               Detail
             </Link>
             <ReaderNavLink href={nextHref} label={nextLabel ? `Next ${nextLabel}` : "Next"} primary />
@@ -220,10 +220,10 @@ export function ReaderShell({
         </div>
       </div>
 
-      <div className="sticky top-[85px] z-20 mx-auto mb-3 max-w-7xl px-3 sm:top-[73px] sm:px-4">
-        <div className="rounded-[1.5rem] border border-white/10 bg-black/72 p-2 shadow-2xl shadow-black/30 backdrop-blur-xl">
+      <div className="sticky top-[78px] z-20 mx-auto mb-2 max-w-7xl px-3 sm:top-[65px] sm:px-4">
+        <div className="rounded-xl border border-white/10 bg-black/72 p-1.5 shadow-xl shadow-black/30 backdrop-blur-xl">
           <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-zinc-300 lg:justify-between">
-            <div className="rounded-2xl bg-white/[0.05] px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-lime-300">
+            <div className="rounded-lg bg-white/[0.05] px-2.5 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-lime-300">
               Webtoon scroll / local progress
             </div>
             <div className="flex flex-wrap justify-center gap-2">
@@ -240,9 +240,9 @@ export function ReaderShell({
           <section
             key={page.pageNumber}
             data-reader-page={page.pageNumber}
-            className={`group relative mx-auto ${widthClass[settings.width]} ${gapClass[settings.gap]} overflow-hidden bg-zinc-950 shadow-2xl shadow-black/40 sm:rounded-[1.75rem]`}
+            className={`group relative mx-auto ${widthClass[settings.width]} ${gapClass[settings.gap]} overflow-hidden bg-zinc-950 shadow-xl shadow-black/40 sm:rounded-lg`}
           >
-            <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full border border-white/10 bg-black/60 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-white opacity-0 backdrop-blur transition group-hover:opacity-100">
+            <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-md border border-white/10 bg-black/60 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-white opacity-0 backdrop-blur transition group-hover:opacity-100">
               Page {page.pageNumber}/{pages.length}
             </div>
             <ReaderPageImage page={page} />
@@ -251,11 +251,11 @@ export function ReaderShell({
       </div>
 
       <div className="mx-auto max-w-4xl px-4 py-8">
-        <div className="rounded-[2rem] border border-white/10 bg-black/70 p-4 shadow-2xl shadow-black/30 sm:p-5">
+        <div className="rounded-xl border border-white/10 bg-black/70 p-4 shadow-xl shadow-black/30">
           <p className="text-center text-xs font-black uppercase tracking-[0.2em] text-zinc-500">End of chapter</p>
           <div className="mt-4 flex flex-wrap justify-center gap-3 text-sm font-black">
             <ReaderNavLink href={previousHref} label={previousLabel ? `Previous ${previousLabel}` : "Previous"} />
-            <Link href={detailHref} className="rounded-full border border-white/10 px-5 py-3 text-zinc-200 transition hover:bg-white/10">
+            <Link href={detailHref} className="rounded-md border border-white/10 px-4 py-2.5 text-zinc-200 transition hover:bg-white/10">
               Back to detail
             </Link>
             <ReaderNavLink href={nextHref} label={nextLabel ? `Next ${nextLabel}` : "Next"} primary />
@@ -270,11 +270,11 @@ export function ReaderShell({
 
 function ReaderNavLink({ href, label, primary }: { href?: string; label: string; primary?: boolean }) {
   if (!href) {
-    return <span className="cursor-not-allowed rounded-full border border-white/10 px-4 py-2 text-zinc-600">{label}</span>;
+    return <span className="cursor-not-allowed rounded-md border border-white/10 px-3 py-2 text-zinc-600">{label}</span>;
   }
   const className = primary
-    ? "rounded-full bg-lime-300 px-4 py-2 text-black transition hover:bg-lime-200"
-    : "rounded-full border border-white/10 px-4 py-2 text-zinc-200 transition hover:bg-white/10";
+    ? "rounded-md bg-lime-300 px-3 py-2 text-black transition hover:bg-lime-200"
+    : "rounded-md border border-white/10 px-3 py-2 text-zinc-200 transition hover:bg-white/10";
   return (
     <Link href={href} className={className}>
       {label}
@@ -294,14 +294,14 @@ function ToggleGroup({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="flex items-center gap-1 rounded-2xl bg-white/[0.06] p-1">
+    <div className="flex items-center gap-1 rounded-lg bg-white/[0.06] p-1">
       <span className="px-2 text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">{label}</span>
       {values.map((item) => (
         <button
           key={item}
           type="button"
           onClick={() => onChange(item)}
-          className={`rounded-xl px-2.5 py-1.5 transition ${item === value ? "bg-lime-300 text-black" : "hover:bg-white/10 hover:text-white"}`}
+          className={`rounded-md px-2.5 py-1.5 transition ${item === value ? "bg-lime-300 text-black" : "hover:bg-white/10 hover:text-white"}`}
         >
           {item}
         </button>

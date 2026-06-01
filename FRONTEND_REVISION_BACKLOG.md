@@ -76,6 +76,18 @@ Implementation batches:
     - Touched `web/src/app/series/[slug]/[chapterSlug]/page.tsx` and `web/src/components/reader-shell.tsx`.
     - Validation passed: `npm run lint`, `npm run build` from `web/`.
 
+Visual calibration follow-up:
+
+- Status: completed in working tree after initial public UI refresh.
+- Goal: move the first pass away from oversized landing-page styling and closer to a compact, metadata-dense comic discovery/index feel while still using original Gomic styling and real API data.
+- Completed notes:
+  - Tightened home hero, update rows/cards, recently added links, stats, section headers, and shared `SeriesCard` spacing/radius/typography.
+  - Tightened series detail layout with smaller cover rail, compact hero shell, denser metadata chips/facts, compact source panels, and smaller chapter container.
+  - Tightened `ChapterList` rows and resume strip with smaller radius, padding, badges, and row spacing while keeping touch targets usable.
+  - Tightened reader chrome with slimmer sticky bars, compact nav/settings controls, smaller page frame radius, and less heavy end-of-chapter panel.
+  - Continued avoiding fake ratings, ranks, comments, follows, recommendations, uploaders, groups, or unavailable metadata.
+  - Touched `web/src/app/page.tsx`, `web/src/components/series-card.tsx`, `web/src/app/series/[slug]/page.tsx`, `web/src/components/chapter-list.tsx`, and `web/src/components/reader-shell.tsx`.
+
 Shared visual direction:
 
 - Dark, app-like comic platform mood.
