@@ -19,44 +19,45 @@ export default async function Home() {
   const partialCount = allSeries.filter((series) => series.latestChapter && series.latestChapter.pageCount === 0).length;
   const metadataOnlyCount = allSeries.filter((series) => !series.latestChapter).length;
   const heroSeries = pickHeroSeries(featured, readableSeries, allSeries);
-  const trending = [...readableSeries].sort((a, b) => b.chapterCount - a.chapterCount).slice(0, 8);
-  const recentlyAdded = allSeries.slice(0, 8);
+  const trending = [...readableSeries].sort((a, b) => b.chapterCount - a.chapterCount).slice(0, 12);
+  const recentlyAdded = allSeries.slice(0, 10);
   const recent = recentChapters.slice(0, 10);
   const genres = allGenres.slice(0, 14);
   const sourceStats = buildSourceStats(allSeries);
 
   return (
     <main className="overflow-hidden bg-[#050506]">
-      <section className="relative border-b border-white/10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_8%,rgba(190,242,100,0.12),transparent_24%),radial-gradient(circle_at_82%_16%,rgba(56,189,248,0.08),transparent_26%),linear-gradient(180deg,#09090b_0%,#050506_72%)]" />
-        <div className="relative mx-auto grid max-w-7xl gap-5 px-3 py-5 sm:px-4 lg:grid-cols-[minmax(0,1.12fr)_20rem] lg:px-6 lg:py-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
-          <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-md border border-lime-300/25 bg-lime-300/10 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-lime-200">
-                Gomic discovery
-              </span>
-              <span className="rounded-md border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-300">
-                {allSeries.length} titles / {readableSeries.length} readable
-              </span>
+      <section className="relative border-b border-white/10 bg-[#09090b]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_0%,rgba(190,242,100,0.08),transparent_28%),linear-gradient(180deg,#0b0b0d_0%,#050506_82%)]" />
+        <div className="relative mx-auto grid max-w-7xl gap-4 px-3 py-4 sm:px-4 lg:grid-cols-[minmax(0,1fr)_18rem] lg:px-6">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
+              <div className="min-w-0">
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-lime-300">Gomic</p>
+                <h1 className="mt-1 truncate text-2xl font-black text-white sm:text-3xl">Komik terbaru dan populer</h1>
+              </div>
+              <Link href="/series" className="shrink-0 rounded-md bg-lime-300 px-3 py-2 text-xs font-black uppercase tracking-[0.14em] text-black transition hover:bg-lime-200">
+                Catalog
+              </Link>
             </div>
 
             {heroSeries ? <HeroFeature series={heroSeries} /> : <EmptyHero />}
 
-            <div className="grid gap-2 sm:grid-cols-3">
-              <Stat label="Catalog" value={allSeries.length.toString()} tone="lime" />
-              <Stat label="Readable" value={readableSeries.length.toString()} tone="sky" />
-              <Stat label="Partial" value={partialCount.toString()} tone="amber" />
+            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
+              {trending.slice(0, 6).map((series, index) => (
+                <MiniPoster key={series.slug} series={series} index={index + 1} />
+              ))}
             </div>
 
             <ContinueReadingCard seriesList={allSeries} />
           </div>
 
-          <aside className="space-y-3 lg:pt-8">
-            <section className="rounded-xl border border-white/10 bg-[#111114]/90 p-4 shadow-xl shadow-black/30 backdrop-blur">
-              <div className="mb-3 flex items-center justify-between gap-3">
+          <aside className="space-y-3">
+            <section className="rounded-lg border border-white/10 bg-[#111114]/95 p-3 shadow-xl shadow-black/30 backdrop-blur">
+              <div className="mb-2 flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.22em] text-lime-300">Hot updates</p>
-                  <h2 className="mt-1 text-lg font-black text-white">Fresh chapters</h2>
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-lime-300">Updates</p>
+                  <h2 className="text-base font-black text-white">Fresh chapters</h2>
                 </div>
                 <Link href="/series" className="text-xs font-black uppercase tracking-[0.18em] text-zinc-400 hover:text-lime-200">
                   All
@@ -75,9 +76,9 @@ export default async function Home() {
               )}
             </section>
 
-            <section className="rounded-xl border border-white/10 bg-[#111114] p-4">
-              <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-300">Source mix</p>
-              <div className="mt-3 space-y-2">
+            <section className="rounded-lg border border-white/10 bg-[#111114] p-3">
+              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-sky-300">Source mix</p>
+              <div className="mt-2 space-y-1.5">
                 {sourceStats.map((source) => (
                   <div key={source.id} className="flex items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2">
                     <span className="text-sm font-bold text-zinc-200">{source.label}</span>
@@ -99,9 +100,9 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6">
           <SectionHeader kicker="Trending" title="Bacaan paling aktif" href="/series" />
           {trending.length ? (
-            <div className="flex gap-3 overflow-x-auto pb-3 [scrollbar-width:thin] lg:grid lg:grid-cols-5 lg:overflow-visible lg:pb-0 xl:grid-cols-6">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {trending.map((series) => (
-                <div key={series.slug} className="min-w-48 lg:min-w-0">
+                <div key={series.slug}>
                   <SeriesCard series={series} />
                 </div>
               ))}
@@ -112,11 +113,11 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-3 py-7 sm:px-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:px-6">
+      <section className="mx-auto grid max-w-7xl gap-4 px-3 py-6 sm:px-4 lg:grid-cols-[minmax(0,1fr)_18rem] lg:px-6">
         <div>
           <SectionHeader kicker="Latest" title="Update chapter terbaru" href="/series" />
           {recent.length ? (
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid gap-2 md:grid-cols-2">
               {recent.map(({ series, chapter }, index) => (
                 <UpdateCard key={`${series.slug}-${chapter.slug}`} series={series} chapter={chapter} index={index + 1} />
               ))}
@@ -127,7 +128,7 @@ export default async function Home() {
         </div>
 
         <aside className="space-y-4">
-          <section className="rounded-xl border border-white/10 bg-[#111114] p-4">
+          <section className="rounded-lg border border-white/10 bg-[#111114] p-3">
             <p className="text-xs font-black uppercase tracking-[0.22em] text-lime-300">Genre rail</p>
             <h2 className="mt-2 text-xl font-black text-white">Jalur cepat eksplor.</h2>
             <div className="mt-4 flex flex-wrap gap-1.5">
@@ -147,9 +148,9 @@ export default async function Home() {
             </div>
           </section>
 
-          <section className="rounded-xl border border-white/10 bg-[#111114] p-4">
+          <section className="rounded-lg border border-white/10 bg-[#111114] p-3">
             <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-300">Platform state</p>
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="mt-3 grid grid-cols-2 gap-2">
               <MiniStat label="Sources" value={sourceStats.length.toString()} />
               <MiniStat label="Partial" value={partialCount.toString()} />
               <MiniStat label="Genres" value={allGenres.length.toString()} />
@@ -200,20 +201,20 @@ function HeroFeature({ series }: { series: SeriesSummary }) {
   const latestHref = latest && latest.pageCount > 0 ? `/series/${series.slug}/${latest.slug}` : `/series/${series.slug}`;
 
   return (
-    <article className="grid overflow-hidden rounded-xl border border-white/10 bg-[linear-gradient(145deg,rgba(255,255,255,0.075),rgba(255,255,255,0.025))] shadow-xl shadow-black/30 sm:grid-cols-[11rem_minmax(0,1fr)] lg:grid-cols-[14rem_minmax(0,1fr)]">
-      <Link href={`/series/${series.slug}`} className="relative min-h-64 overflow-hidden bg-zinc-950 sm:min-h-full">
+    <article className="grid overflow-hidden rounded-lg border border-white/10 bg-[#111114] shadow-xl shadow-black/30 sm:grid-cols-[12rem_minmax(0,1fr)] lg:grid-cols-[13rem_minmax(0,1fr)]">
+      <Link href={`/series/${series.slug}`} className="relative min-h-72 overflow-hidden bg-zinc-950 sm:min-h-full">
         {series.coverUrl ? (
           <div
             className="absolute inset-0 scale-105 bg-cover bg-center opacity-95 transition duration-700 hover:scale-110"
             style={{ backgroundImage: `url(${series.coverUrl})` }}
           />
         ) : null}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
         <div className="absolute left-3 top-3 rounded-md border border-lime-300/30 bg-lime-300/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-lime-100 backdrop-blur">
           Featured
         </div>
       </Link>
-      <div className="flex flex-col justify-between gap-5 p-4 sm:p-5 lg:p-6">
+      <div className="flex flex-col justify-between gap-4 p-4 lg:p-5">
         <div>
           <div className="flex flex-wrap gap-2">
             <Badge>{sourceLabel(series.sourceId)}</Badge>
@@ -221,10 +222,10 @@ function HeroFeature({ series }: { series: SeriesSummary }) {
             <Badge>{titleCase(series.status)}</Badge>
             <Badge>{series.chapterCount} ch</Badge>
           </div>
-          <h1 className="mt-4 max-w-3xl text-3xl font-black leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
+          <h2 className="mt-3 max-w-3xl text-2xl font-black leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl">
             {series.title}
-          </h1>
-          <p className="mt-3 line-clamp-3 max-w-2xl text-sm leading-6 text-zinc-300 lg:text-base lg:leading-7">
+          </h2>
+          <p className="mt-3 line-clamp-4 max-w-2xl text-sm leading-6 text-zinc-300">
             {series.synopsis || "Belum ada synopsis dari source ini, tapi title ini sudah masuk catalog Gomic."}
           </p>
         </div>
@@ -278,6 +279,20 @@ function UpdateRow({ series, chapter, index }: { series: SeriesSummary; chapter:
   );
 }
 
+function MiniPoster({ series, index }: { series: SeriesSummary; index: number }) {
+  return (
+    <Link href={`/series/${series.slug}`} className="group relative h-40 min-w-28 overflow-hidden rounded-lg border border-white/10 bg-zinc-950 sm:h-48 sm:min-w-32">
+      {series.coverUrl ? <span className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105" style={{ backgroundImage: `url(${series.coverUrl})` }} /> : null}
+      <span className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
+      <span className="absolute left-2 top-2 rounded bg-lime-300 px-1.5 py-0.5 text-[10px] font-black text-black">#{index}</span>
+      <span className="absolute inset-x-0 bottom-0 p-2">
+        <span className="line-clamp-2 text-xs font-black leading-tight text-white">{series.title}</span>
+        <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.12em] text-lime-200">{series.chapterCount} ch</span>
+      </span>
+    </Link>
+  );
+}
+
 function UpdateCard({ series, chapter, index }: { series: SeriesSummary; chapter: ChapterSummary; index: number }) {
   return (
     <Link
@@ -308,16 +323,6 @@ function CompactSeriesLink({ series }: { series: SeriesSummary }) {
         <span className="mt-2 block text-xs text-zinc-500">{titleCase(series.status)} / {series.chapterCount} chapters</span>
       </span>
     </Link>
-  );
-}
-
-function Stat({ label, value, tone }: { label: string; value: string; tone: "lime" | "sky" | "amber" }) {
-  const toneClass = tone === "lime" ? "text-lime-200" : tone === "sky" ? "text-sky-200" : "text-amber-200";
-  return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.05] p-3 shadow-xl shadow-black/10">
-      <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">{label}</p>
-      <p className={`mt-1 text-2xl font-black ${toneClass}`}>{value}</p>
-    </div>
   );
 }
 

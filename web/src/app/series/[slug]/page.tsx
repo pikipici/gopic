@@ -61,9 +61,9 @@ export default async function SeriesDetailPage({ params }: PageProps) {
         ) : null}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_8%,rgba(190,242,100,0.18),transparent_28%),radial-gradient(circle_at_18%_20%,rgba(56,189,248,0.11),transparent_24%),linear-gradient(180deg,rgba(0,0,0,0.22),#050506_78%)]" />
 
-        <div className="relative mx-auto grid max-w-7xl gap-5 px-3 py-6 sm:px-4 lg:grid-cols-[15rem_minmax(0,1fr)_18rem] lg:px-6 lg:py-7">
-          <aside className="lg:sticky lg:top-6 lg:self-start">
-            <div className="relative mx-auto max-w-72 lg:max-w-none">
+        <div className="relative mx-auto grid max-w-7xl gap-4 px-3 py-4 sm:px-4 lg:grid-cols-[13rem_minmax(0,1fr)_17rem] lg:px-6 lg:py-5">
+          <aside className="lg:sticky lg:top-16 lg:self-start">
+            <div className="relative mx-auto max-w-48 sm:max-w-56 lg:max-w-none">
               <div className="absolute -inset-2 rounded-xl bg-lime-300/10 blur-2xl" />
               <div className="relative overflow-hidden rounded-xl border border-white/10 bg-zinc-950 shadow-xl shadow-black/40">
                 {series.coverUrl ? (
@@ -75,7 +75,7 @@ export default async function SeriesDetailPage({ params }: PageProps) {
             </div>
           </aside>
 
-          <section className="rounded-xl border border-white/10 bg-black/45 p-4 shadow-xl shadow-black/25 backdrop-blur-md sm:p-5 lg:p-6">
+          <section className="rounded-lg border border-white/10 bg-black/55 p-4 shadow-xl shadow-black/25 backdrop-blur-md lg:p-5">
             <div className="flex flex-wrap gap-1.5 text-[11px] font-black uppercase tracking-[0.15em]">
               <span className={`rounded-md border px-2.5 py-1 ${sourceClass(series.sourceId)}`}>{sourceLabel(series.sourceId)}</span>
               <span className="rounded-md border border-white/10 bg-white/10 px-2.5 py-1 text-zinc-200">{titleCase(series.type)}</span>
@@ -83,7 +83,7 @@ export default async function SeriesDetailPage({ params }: PageProps) {
               <span className="rounded-md border border-lime-300/25 bg-lime-300/10 px-2.5 py-1 text-lime-100">{readableChapters.length} readable</span>
             </div>
 
-            <h1 className="mt-4 text-3xl font-black leading-tight tracking-tight text-white sm:text-5xl">{series.title}</h1>
+            <h1 className="mt-3 text-2xl font-black leading-tight tracking-tight text-white sm:text-4xl">{series.title}</h1>
 
             {series.altTitles.length ? <p className="mt-3 line-clamp-1 text-sm text-zinc-500">Also known as: {series.altTitles.slice(0, 3).join(" / ")}</p> : null}
 
@@ -100,12 +100,12 @@ export default async function SeriesDetailPage({ params }: PageProps) {
               <Fact label="Updated" value={formatDate(series.updatedAt)} />
             </dl>
 
-            <section className="mt-5 rounded-xl border border-white/10 bg-white/[0.04] p-4">
+            <section className="mt-4 rounded-lg border border-white/10 bg-white/[0.04] p-3">
               <div className="flex items-center justify-between gap-4">
                 <h2 className="text-sm font-black uppercase tracking-[0.22em] text-lime-300">Synopsis</h2>
                 <span className="text-xs font-bold text-zinc-500">{series.releaseYear || "Unknown year"}</span>
               </div>
-              <p className="mt-3 line-clamp-6 text-sm leading-6 text-zinc-300">
+              <p className="mt-2 line-clamp-4 text-sm leading-6 text-zinc-300">
                 {series.synopsis || "Belum ada synopsis dari source ini. Detail tetap bisa dipakai untuk cek chapter dan status import."}
               </p>
             </section>
@@ -121,7 +121,7 @@ export default async function SeriesDetailPage({ params }: PageProps) {
             ) : null}
           </section>
 
-          <aside className="space-y-4">
+          <aside className="space-y-3">
             <InfoPanel title="Import Source">
               <div className="space-y-2 text-sm">
                 <KeyValue label="Source" value={sourceLabel(series.sourceId)} />
@@ -158,7 +158,7 @@ export default async function SeriesDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-3 py-6 sm:px-4 lg:px-6">
+      <section className="mx-auto max-w-7xl px-3 py-5 sm:px-4 lg:px-6">
         <div className="overflow-hidden rounded-xl border border-white/10 bg-[linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.025))] shadow-xl shadow-black/20">
           <div className="border-b border-white/10 p-4 sm:flex sm:items-end sm:justify-between">
             <div>

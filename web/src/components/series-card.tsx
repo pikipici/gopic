@@ -22,7 +22,7 @@ export function SeriesCard({ series }: { series: SeriesSummary }) {
   const readableLabel = hasPages ? "Ready" : latest ? "Partial" : "Metadata";
 
   return (
-    <article className="group overflow-hidden rounded-xl border border-white/10 bg-[#111114] shadow-xl shadow-black/25 transition duration-200 hover:-translate-y-0.5 hover:border-lime-300/35 hover:bg-[#151519]">
+    <article className="group overflow-hidden rounded-lg border border-white/10 bg-[#101013] shadow-lg shadow-black/25 transition duration-200 hover:-translate-y-0.5 hover:border-lime-300/35 hover:bg-[#151519]">
       <Link href={`/series/${series.slug}`} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(190,242,100,0.22),transparent_35%),linear-gradient(135deg,#27272a,#09090b)]">
           {series.coverUrl ? (
@@ -48,11 +48,11 @@ export function SeriesCard({ series }: { series: SeriesSummary }) {
           </div>
         </div>
       </Link>
-      <div className="space-y-3 p-3">
-        <p className="line-clamp-2 min-h-10 text-xs leading-5 text-zinc-400">
+      <div className="space-y-2.5 p-2.5">
+        <p className="line-clamp-2 min-h-9 text-xs leading-5 text-zinc-400">
           {series.synopsis || "Belum ada synopsis dari source ini."}
         </p>
-        <div className="flex min-h-6 flex-wrap gap-1.5">
+        <div className="hidden min-h-6 flex-wrap gap-1.5 sm:flex">
           {series.genres.length ? (
             series.genres.slice(0, 3).map((genre) => (
               <span key={genre} className="rounded-md bg-white/10 px-2 py-1 text-[11px] text-zinc-300">

@@ -13,7 +13,7 @@ export function MobileBottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-3 bottom-3 z-50 rounded-[1.5rem] border border-white/10 bg-black/85 p-2 shadow-2xl shadow-black/50 backdrop-blur-xl md:hidden">
+    <nav className="fixed inset-x-3 bottom-3 z-50 rounded-xl border border-white/10 bg-black/90 p-1.5 shadow-2xl shadow-black/50 backdrop-blur-xl md:hidden">
       <div className="grid grid-cols-3 gap-1">
         {navItems.map((item) => {
           const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
