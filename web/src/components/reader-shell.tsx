@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { type ReactNode, useEffect, useState } from "react";
 import { ReaderProgressTracker } from "@/components/reader-progress-tracker";
 import { getChapterProgress } from "@/lib/reading-progress";
@@ -68,6 +69,7 @@ type ReaderPageImageProps = {
 function ReaderPageImage({ page }: ReaderPageImageProps) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
   const resolvedUrl = resolvePageImageUrl(page.imageUrl);
 
@@ -78,17 +80,32 @@ function ReaderPageImage({ page }: ReaderPageImageProps) {
   if (failed) {
     return (
       <PageFallback pageNumber={page.pageNumber} message="Gagal load image page ini." imageUrl={resolvedUrl}>
-        <button
-          type="button"
-          onClick={() => {
-            setFailed(false);
-            setLoaded(false);
-            setRetryKey((value) => value + 1);
-          }}
-          className="rounded-full bg-lime-300 px-4 py-2 text-sm font-black text-black transition hover:bg-lime-200"
-        >
-          Retry page
-        </button>
+        <div className="flex flex-wrap justify-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setFailed(false);
+              setLoaded(false);
+              setRetryKey((value) => value + 1);
+            }}
+            className="rounded-full bg-lime-300 px-4 py-2 text-sm font-black text-black transition hover:bg-lime-200"
+          >
+            Retry page
+          </button>
+          <a href={resolvedUrl} target="_blank" rel="noreferrer" className="rounded-full border border-white/15 px-4 py-2 text-sm font-black text-white transition hover:bg-white/10">
+            Open image
+          </a>
+          <button
+            type="button"
+            onClick={async () => {
+              await navigator.clipboard?.writeText(resolvedUrl);
+              setCopied(true);
+            }}
+            className="rounded-full border border-white/15 px-4 py-2 text-sm font-black text-white transition hover:bg-white/10"
+          >
+            {copied ? "Copied" : "Copy URL"}
+          </button>
+        </div>
       </PageFallback>
     );
   }
@@ -142,11 +159,27 @@ function PageFallback({
 export function ReaderShell({
   pages,
   seriesSlug,
+  seriesTitle,
   chapterSlug,
+  chapterTitle,
+  chapterLabel,
+  detailHref,
+  previousHref,
+  previousLabel,
+  nextHref,
+  nextLabel,
 }: {
   pages: ChapterPage[];
   seriesSlug: string;
+  seriesTitle: string;
   chapterSlug: string;
+  chapterTitle: string;
+  chapterLabel: string;
+  detailHref: string;
+  previousHref?: string;
+  previousLabel?: string;
+  nextHref?: string;
+  nextLabel?: string;
 }) {
   const [settings, setSettings] = useState<ReaderSettings>(loadSettings);
 
@@ -167,42 +200,42 @@ export function ReaderShell({
   };
 
   return (
-    <div className={`${backgroundClass[settings.background]} min-h-screen pb-24 transition-colors`}>
-      <div className="sticky top-[145px] z-20 mx-auto mb-4 max-w-6xl px-3 sm:top-[89px] sm:px-4">
-        <div className="rounded-[1.75rem] border border-white/10 bg-black/80 p-2 shadow-2xl shadow-black/30 backdrop-blur-xl">
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/[0.05] px-3 py-2">
-              <span className="text-[10px] font-black uppercase tracking-[0.22em] text-lime-300">Reader</span>
-              <span className="text-xs font-bold text-zinc-400">{pages.length} pages</span>
+    <div className={`${backgroundClass[settings.background]} min-h-screen pb-10 transition-colors`}>
+      <div className="sticky top-0 z-30 border-b border-white/10 bg-black/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-3 py-3 sm:px-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <Link href={detailHref} className="text-xs font-black uppercase tracking-[0.2em] text-lime-300 hover:text-lime-200">
+              Back to series
+            </Link>
+            <h1 className="mt-1 truncate text-base font-black text-white sm:text-lg">{seriesTitle}</h1>
+            <p className="truncate text-xs text-zinc-500">{chapterLabel} / {chapterTitle || "Untitled chapter"} / {pages.length} pages</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-sm font-black">
+            <ReaderNavLink href={previousHref} label={previousLabel ? `Prev ${previousLabel}` : "Prev"} />
+            <Link href={detailHref} className="rounded-full border border-white/10 px-4 py-2 text-zinc-200 transition hover:bg-white/10">
+              Detail
+            </Link>
+            <ReaderNavLink href={nextHref} label={nextLabel ? `Next ${nextLabel}` : "Next"} primary />
+          </div>
+        </div>
+      </div>
+
+      <div className="sticky top-[85px] z-20 mx-auto mb-3 max-w-7xl px-3 sm:top-[73px] sm:px-4">
+        <div className="rounded-[1.5rem] border border-white/10 bg-black/72 p-2 shadow-2xl shadow-black/30 backdrop-blur-xl">
+          <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-zinc-300 lg:justify-between">
+            <div className="rounded-2xl bg-white/[0.05] px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-lime-300">
+              Webtoon scroll / local progress
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-zinc-300 lg:justify-end">
-              <ToggleGroup
-                label="Width"
-                value={settings.width}
-                values={["compact", "comfort", "wide"]}
-                onChange={(value) => updateSettings("width", value as WidthMode)}
-              />
-              <ToggleGroup
-                label="Gap"
-                value={settings.gap}
-                values={["tight", "normal", "airy"]}
-                onChange={(value) => updateSettings("gap", value as GapMode)}
-              />
-              <ToggleGroup
-                label="BG"
-                value={settings.background}
-                values={["black", "charcoal", "paper"]}
-                onChange={(value) => updateSettings("background", value as BackgroundMode)}
-              />
+            <div className="flex flex-wrap justify-center gap-2">
+              <ToggleGroup label="Width" value={settings.width} values={["compact", "comfort", "wide"]} onChange={(value) => updateSettings("width", value as WidthMode)} />
+              <ToggleGroup label="Gap" value={settings.gap} values={["tight", "normal", "airy"]} onChange={(value) => updateSettings("gap", value as GapMode)} />
+              <ToggleGroup label="BG" value={settings.background} values={["black", "charcoal", "paper"]} onChange={(value) => updateSettings("background", value as BackgroundMode)} />
             </div>
           </div>
         </div>
       </div>
 
       <div className="mx-auto max-w-6xl px-0 py-1 sm:px-4">
-        <div className="mx-auto mb-4 max-w-3xl rounded-3xl border border-white/10 bg-black/55 p-4 text-center text-sm text-zinc-400 shadow-xl shadow-black/20">
-          Reader settings persist lokal. Progress page otomatis masuk Library.
-        </div>
         {pages.map((page) => (
           <section
             key={page.pageNumber}
@@ -216,8 +249,36 @@ export function ReaderShell({
           </section>
         ))}
       </div>
+
+      <div className="mx-auto max-w-4xl px-4 py-8">
+        <div className="rounded-[2rem] border border-white/10 bg-black/70 p-4 shadow-2xl shadow-black/30 sm:p-5">
+          <p className="text-center text-xs font-black uppercase tracking-[0.2em] text-zinc-500">End of chapter</p>
+          <div className="mt-4 flex flex-wrap justify-center gap-3 text-sm font-black">
+            <ReaderNavLink href={previousHref} label={previousLabel ? `Previous ${previousLabel}` : "Previous"} />
+            <Link href={detailHref} className="rounded-full border border-white/10 px-5 py-3 text-zinc-200 transition hover:bg-white/10">
+              Back to detail
+            </Link>
+            <ReaderNavLink href={nextHref} label={nextLabel ? `Next ${nextLabel}` : "Next"} primary />
+          </div>
+        </div>
+      </div>
+
       <ReaderProgressTracker seriesSlug={seriesSlug} chapterSlug={chapterSlug} totalPages={pages.length} />
     </div>
+  );
+}
+
+function ReaderNavLink({ href, label, primary }: { href?: string; label: string; primary?: boolean }) {
+  if (!href) {
+    return <span className="cursor-not-allowed rounded-full border border-white/10 px-4 py-2 text-zinc-600">{label}</span>;
+  }
+  const className = primary
+    ? "rounded-full bg-lime-300 px-4 py-2 text-black transition hover:bg-lime-200"
+    : "rounded-full border border-white/10 px-4 py-2 text-zinc-200 transition hover:bg-white/10";
+  return (
+    <Link href={href} className={className}>
+      {label}
+    </Link>
   );
 }
 
