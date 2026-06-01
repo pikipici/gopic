@@ -92,7 +92,7 @@ function NoPagesState({
         <h1 className="mt-3 text-3xl font-black text-white sm:text-5xl">{chapterLabel}</h1>
         <p className="mt-2 text-lg font-semibold text-zinc-200">{chapterTitle || "Untitled chapter"}</p>
         <p className="mx-auto mt-5 max-w-xl text-sm leading-6 text-amber-100/85">
-          Metadata chapter sudah masuk dari source, tapi fetch pages belum berhasil. Chapter ini sengaja tidak dibuat blank supaya partial import kelihatan jelas.
+          Metadata chapter sudah masuk, tapi pages belum berhasil tersedia. Chapter ini sengaja tidak dibuat blank supaya partial import kelihatan jelas.
         </p>
         <div className="mt-7 flex flex-wrap justify-center gap-3">
           {previousHref ? (

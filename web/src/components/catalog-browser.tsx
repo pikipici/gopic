@@ -10,13 +10,9 @@ import { titleCase } from "@/lib/format";
 type SortMode = "latest" | "title" | "chapters" | "year";
 
 const ALL = "All";
-const filterKeys = ["q", "genre", "type", "status", "demographic", "rating", "source", "sort"];
+const filterKeys = ["q", "genre", "type", "status", "demographic", "rating", "sort"];
 
 function facetLabel(value: string) {
-  if (value === "komikcast") return "KomikCast";
-  if (value === "komikindo") return "KomikIndo";
-  if (value === "mock-mihon") return "Mock Mihon";
-  if (value === "seed") return "Seed";
   return titleCase(value);
 }
 
@@ -30,7 +26,6 @@ export function CatalogBrowser({ seriesList, genres }: { seriesList: SeriesSumma
   const type = (searchParams.get("type") ?? ALL) as typeof ALL | SeriesType;
   const demographic = (searchParams.get("demographic") ?? ALL) as typeof ALL | Demographic;
   const rating = (searchParams.get("rating") ?? ALL) as typeof ALL | ContentRating;
-  const source = searchParams.get("source") ?? ALL;
   const sort = (searchParams.get("sort") ?? "latest") as SortMode;
 
   const updateParam = (key: string, value: string) => {
@@ -54,7 +49,6 @@ export function CatalogBrowser({ seriesList, genres }: { seriesList: SeriesSumma
       statuses: Array.from(new Set(seriesList.map((series) => series.status))).sort(),
       demographics: Array.from(new Set(seriesList.map((series) => series.demographic))).sort(),
       ratings: Array.from(new Set(seriesList.map((series) => series.contentRating))).sort(),
-      sources: Array.from(new Set(seriesList.map((series) => series.sourceId || "seed"))).sort(),
     }),
     [seriesList],
   );
@@ -75,9 +69,8 @@ export function CatalogBrowser({ seriesList, genres }: { seriesList: SeriesSumma
         const matchesType = type === ALL || series.type === type;
         const matchesDemographic = demographic === ALL || series.demographic === demographic;
         const matchesRating = rating === ALL || series.contentRating === rating;
-        const matchesSource = source === ALL || (series.sourceId || "seed") === source;
 
-        return matchesQuery && matchesGenre && matchesStatus && matchesType && matchesDemographic && matchesRating && matchesSource;
+        return matchesQuery && matchesGenre && matchesStatus && matchesType && matchesDemographic && matchesRating;
       })
       .sort((a, b) => {
         if (sort === "title") return a.title.localeCompare(b.title);
@@ -85,7 +78,7 @@ export function CatalogBrowser({ seriesList, genres }: { seriesList: SeriesSumma
         if (sort === "year") return b.releaseYear - a.releaseYear;
         return b.updatedAt.localeCompare(a.updatedAt);
       });
-  }, [demographic, genre, query, rating, seriesList, sort, source, status, type]);
+  }, [demographic, genre, query, rating, seriesList, sort, status, type]);
 
   const resetFilters = () => {
     setQueryState("");
@@ -112,7 +105,7 @@ export function CatalogBrowser({ seriesList, genres }: { seriesList: SeriesSumma
           </div>
         </div>
         <div className="p-4">
-          <div className="grid gap-3 lg:grid-cols-[1.4fr_repeat(3,180px)]">
+          <div className="grid gap-3 lg:grid-cols-[1.4fr_repeat(2,180px)]">
             <label className="block">
               <span className="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">Search</span>
               <input
@@ -122,7 +115,6 @@ export function CatalogBrowser({ seriesList, genres }: { seriesList: SeriesSumma
                 className="h-12 w-full rounded-2xl border border-white/10 bg-black/35 px-4 text-white outline-none transition placeholder:text-zinc-600 focus:border-lime-300/60"
               />
             </label>
-            <FacetSelect label="Source" value={source} onChange={(value) => updateParam("source", value)} values={facets.sources} />
             <FacetSelect label="Genre" value={genre} onChange={(value) => updateParam("genre", value)} values={genres} />
             <FacetSelect label="Type" value={type} onChange={(value) => updateParam("type", value)} values={facets.types} />
           </div>

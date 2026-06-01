@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { ChapterList } from "@/components/chapter-list";
 import { getSeedStaticParams, getSeriesBySlug } from "@/lib/catalog";
@@ -8,20 +7,6 @@ import { formatDate, titleCase } from "@/lib/format";
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
-
-function sourceLabel(sourceId?: string) {
-  if (sourceId === "komikcast") return "KomikCast";
-  if (sourceId === "komikindo") return "KomikIndo";
-  if (sourceId === "mock-mihon") return "Mock source";
-  return "Seed catalog";
-}
-
-function sourceClass(sourceId?: string) {
-  if (sourceId === "komikcast") return "border-sky-300/30 bg-sky-300/15 text-sky-100";
-  if (sourceId === "komikindo") return "border-amber-300/30 bg-amber-300/15 text-amber-100";
-  if (sourceId === "mock-mihon") return "border-fuchsia-300/30 bg-fuchsia-300/15 text-fuchsia-100";
-  return "border-white/15 bg-white/10 text-white";
-}
 
 export function generateStaticParams() {
   return getSeedStaticParams();
@@ -52,63 +37,67 @@ export default async function SeriesDetailPage({ params }: PageProps) {
   const totalPages = series.chapters.reduce((sum, chapter) => sum + chapter.pageCount, 0);
   const latestChapter = series.latestChapter ?? series.chapters[0];
   const topGenres = series.genres.slice(0, 8);
+  const credits = [series.authorName, series.artistName].filter(Boolean).join(" / ");
 
   return (
     <main className="overflow-hidden bg-[#050506]">
-      <section className="relative border-b border-white/10">
+      <section className="relative border-b border-white/10 bg-[#09090b]">
         {series.coverUrl ? (
-          <div className="absolute inset-0 opacity-25 blur-3xl" style={{ backgroundImage: `url(${series.coverUrl})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+          <div className="absolute inset-0 opacity-20 blur-3xl" style={{ backgroundImage: `url(${series.coverUrl})`, backgroundSize: "cover", backgroundPosition: "center" }} />
         ) : null}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_8%,rgba(190,242,100,0.18),transparent_28%),radial-gradient(circle_at_18%_20%,rgba(56,189,248,0.11),transparent_24%),linear-gradient(180deg,rgba(0,0,0,0.22),#050506_78%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_8%,rgba(190,242,100,0.15),transparent_28%),linear-gradient(180deg,rgba(0,0,0,0.1),#050506_86%)]" />
 
-        <div className="relative mx-auto grid max-w-7xl gap-4 px-3 py-4 sm:px-4 lg:grid-cols-[13rem_minmax(0,1fr)_17rem] lg:px-6 lg:py-5">
+        <div className="relative mx-auto grid max-w-7xl gap-4 px-3 py-4 sm:px-4 lg:grid-cols-[15rem_minmax(0,1fr)] lg:px-6 lg:py-6">
           <aside className="lg:sticky lg:top-16 lg:self-start">
-            <div className="relative mx-auto max-w-48 sm:max-w-56 lg:max-w-none">
-              <div className="absolute -inset-2 rounded-xl bg-lime-300/10 blur-2xl" />
-              <div className="relative overflow-hidden rounded-xl border border-white/10 bg-zinc-950 shadow-xl shadow-black/40">
-                {series.coverUrl ? (
-                  <div className="aspect-[3/4] bg-cover bg-center" style={{ backgroundImage: `url(${series.coverUrl})` }} />
-                ) : (
-                  <div className="flex aspect-[3/4] items-center justify-center bg-white/[0.04] text-sm font-black uppercase tracking-[0.2em] text-zinc-600">No cover</div>
-                )}
+            <div className="mx-auto max-w-52 rounded-xl border border-white/10 bg-[#111114] p-2 shadow-2xl shadow-black/40 sm:max-w-60 lg:max-w-none">
+              <div className="overflow-hidden rounded-lg bg-zinc-950 ring-1 ring-white/10">
+                {series.coverUrl ? <div className="aspect-[3/4] bg-cover bg-center" style={{ backgroundImage: `url(${series.coverUrl})` }} /> : <div className="flex aspect-[3/4] items-center justify-center bg-white/[0.04] text-sm font-black uppercase tracking-[0.2em] text-zinc-600">No cover</div>}
+              </div>
+              <div className="mt-2 grid gap-2">
+                {firstReadable ? <ReadButton href={`/series/${series.slug}/${firstReadable.slug}`} label={`Start ${firstReadable.numberLabel}`} primary /> : null}
+                {latestReadable && latestReadable.slug !== firstReadable?.slug ? <ReadButton href={`/series/${series.slug}/${latestReadable.slug}`} label={`Latest ${latestReadable.numberLabel}`} /> : null}
+                <ReadButton href="/series" label="Back to catalog" compact />
               </div>
             </div>
           </aside>
 
-          <section className="rounded-lg border border-white/10 bg-black/55 p-4 shadow-xl shadow-black/25 backdrop-blur-md lg:p-5">
-            <div className="flex flex-wrap gap-1.5 text-[11px] font-black uppercase tracking-[0.15em]">
-              <span className={`rounded-md border px-2.5 py-1 ${sourceClass(series.sourceId)}`}>{sourceLabel(series.sourceId)}</span>
+          <section className="min-w-0 rounded-xl border border-white/10 bg-[#111114]/90 p-4 shadow-xl shadow-black/25 backdrop-blur-md sm:p-5 lg:p-6">
+            <div className="flex flex-wrap gap-1.5 text-[10px] font-black uppercase tracking-[0.15em] sm:text-[11px]">
               <span className="rounded-md border border-white/10 bg-white/10 px-2.5 py-1 text-zinc-200">{titleCase(series.type)}</span>
               <span className="rounded-md border border-white/10 bg-white/10 px-2.5 py-1 text-zinc-200">{titleCase(series.status)}</span>
               <span className="rounded-md border border-lime-300/25 bg-lime-300/10 px-2.5 py-1 text-lime-100">{readableChapters.length} readable</span>
+              {series.releaseYear ? <span className="rounded-md border border-white/10 bg-black/25 px-2.5 py-1 text-zinc-300">{series.releaseYear}</span> : null}
             </div>
 
-            <h1 className="mt-3 text-2xl font-black leading-tight tracking-tight text-white sm:text-4xl">{series.title}</h1>
+            <h1 className="mt-3 text-3xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">{series.title}</h1>
 
-            {series.altTitles.length ? <p className="mt-3 line-clamp-1 text-sm text-zinc-500">Also known as: {series.altTitles.slice(0, 3).join(" / ")}</p> : null}
+            {series.altTitles.length ? <p className="mt-3 line-clamp-2 text-sm font-semibold text-zinc-500">Also known as: {series.altTitles.slice(0, 3).join(" / ")}</p> : null}
 
-            <div className="mt-5 flex flex-wrap gap-2">
-              {firstReadable ? <ReadButton href={`/series/${series.slug}/${firstReadable.slug}`} label={`Start ${firstReadable.numberLabel}`} primary /> : null}
-              {latestReadable && latestReadable.slug !== firstReadable?.slug ? <ReadButton href={`/series/${series.slug}/${latestReadable.slug}`} label={`Latest ${latestReadable.numberLabel}`} /> : null}
-              <ReadButton href="/series" label="Back to catalog" />
-            </div>
-
-            <dl className="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            <dl className="mt-5 grid grid-cols-2 gap-2 lg:grid-cols-4">
               <Fact label="Chapters" value={series.chapters.length.toString()} />
               <Fact label="Pages" value={totalPages.toString()} />
-              <Fact label="Partial" value={partialChapters.length.toString()} />
               <Fact label="Updated" value={formatDate(series.updatedAt)} />
+              <Fact label="Latest" value={latestChapter?.numberLabel ?? "None"} />
             </dl>
 
-            <section className="mt-4 rounded-lg border border-white/10 bg-white/[0.04] p-3">
-              <div className="flex items-center justify-between gap-4">
-                <h2 className="text-sm font-black uppercase tracking-[0.22em] text-lime-300">Synopsis</h2>
-                <span className="text-xs font-bold text-zinc-500">{series.releaseYear || "Unknown year"}</span>
-              </div>
-              <p className="mt-2 line-clamp-4 text-sm leading-6 text-zinc-300">
-                {series.synopsis || "Belum ada synopsis dari source ini. Detail tetap bisa dipakai untuk cek chapter dan status import."}
-              </p>
-            </section>
+            <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1fr)_16rem]">
+              <section className="rounded-lg border border-white/10 bg-black/25 p-4">
+                <h2 className="text-xs font-black uppercase tracking-[0.22em] text-lime-300">Synopsis</h2>
+                <p className="mt-3 text-sm leading-6 text-zinc-300">
+                  {series.synopsis || "Belum ada synopsis untuk title ini. Detail tetap bisa dipakai untuk cek chapter dan status import."}
+                </p>
+              </section>
+
+              <section className="rounded-lg border border-white/10 bg-black/25 p-4">
+                <h2 className="text-xs font-black uppercase tracking-[0.22em] text-lime-300">Info</h2>
+                <div className="mt-3 space-y-2 text-sm">
+                  <KeyValue label="Credits" value={credits || "Unknown"} />
+                  <KeyValue label="Demographic" value={titleCase(series.demographic)} />
+                  <KeyValue label="Rating" value={titleCase(series.contentRating)} />
+                  <KeyValue label="Partial" value={partialChapters.length.toString()} />
+                </div>
+              </section>
+            </div>
 
             {topGenres.length ? (
               <div className="mt-4 flex flex-wrap gap-1.5">
@@ -120,50 +109,15 @@ export default async function SeriesDetailPage({ params }: PageProps) {
               </div>
             ) : null}
           </section>
-
-          <aside className="space-y-3">
-            <InfoPanel title="Import Source">
-              <div className="space-y-2 text-sm">
-                <KeyValue label="Source" value={sourceLabel(series.sourceId)} />
-                <KeyValue label="Source ID" value={series.sourceSeriesId || "Not provided"} />
-                <KeyValue label="Last sync" value={series.lastSyncedAt ? formatDate(series.lastSyncedAt) : "Unknown"} />
-                {series.sourceUrl ? (
-                  <a href={series.sourceUrl} target="_blank" rel="noreferrer" className="block rounded-lg border border-white/10 bg-black/25 px-3 py-2.5 font-bold text-zinc-200 transition hover:border-lime-300/40 hover:text-lime-100">
-                    Open source URL
-                  </a>
-                ) : null}
-              </div>
-            </InfoPanel>
-
-            <InfoPanel title="Chapter State">
-              <div className="grid grid-cols-2 gap-2">
-                <MiniFact label="Ready" value={readableChapters.length.toString()} tone="lime" />
-                <MiniFact label="Partial" value={partialChapters.length.toString()} tone="amber" />
-                <MiniFact label="Pages" value={totalPages.toString()} tone="sky" />
-                <MiniFact label="Latest" value={latestChapter?.numberLabel ?? "None"} tone="zinc" />
-              </div>
-            </InfoPanel>
-
-            {series.authorName || series.artistName || series.demographic ? (
-              <InfoPanel title="Credits">
-                <div className="space-y-2 text-sm">
-                  <KeyValue label="Author" value={series.authorName || "Unknown"} />
-                  <KeyValue label="Artist" value={series.artistName || "Unknown"} />
-                  <KeyValue label="Demographic" value={titleCase(series.demographic)} />
-                  <KeyValue label="Rating" value={titleCase(series.contentRating)} />
-                </div>
-              </InfoPanel>
-            ) : null}
-          </aside>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-3 py-5 sm:px-4 lg:px-6">
-        <div className="overflow-hidden rounded-xl border border-white/10 bg-[linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.025))] shadow-xl shadow-black/20">
+        <div className="overflow-hidden rounded-xl border border-white/10 bg-[#111114] shadow-xl shadow-black/20">
           <div className="border-b border-white/10 p-4 sm:flex sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.25em] text-lime-300">Chapters</p>
-              <h2 className="mt-1 text-xl font-black text-white">Read list</h2>
+              <p className="text-xs font-black uppercase tracking-[0.25em] text-lime-300">Chapters</p>
+              <h2 className="mt-1 text-2xl font-black text-white">Daftar chapter</h2>
             </div>
             <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold sm:mt-0">
               <span className="rounded-md bg-lime-300 px-2.5 py-1 text-black">{readableChapters.length}/{series.chapters.length} ready</span>
@@ -184,10 +138,12 @@ export default async function SeriesDetailPage({ params }: PageProps) {
   );
 }
 
-function ReadButton({ href, label, primary }: { href: string; label: string; primary?: boolean }) {
+function ReadButton({ href, label, primary, compact }: { href: string; label: string; primary?: boolean; compact?: boolean }) {
   const className = primary
-    ? "rounded-md bg-lime-300 px-4 py-2.5 text-sm font-black text-black transition hover:bg-lime-200"
-    : "rounded-md border border-white/15 bg-white/[0.04] px-4 py-2.5 text-sm font-black text-white transition hover:bg-white/10";
+    ? "rounded-md bg-lime-300 px-4 py-2.5 text-center text-sm font-black text-black transition hover:bg-lime-200"
+    : compact
+      ? "rounded-md border border-white/15 bg-white/[0.04] px-3 py-2 text-center text-xs font-black text-white transition hover:bg-white/10"
+      : "rounded-md border border-white/15 bg-white/[0.04] px-4 py-2.5 text-center text-sm font-black text-white transition hover:bg-white/10";
   return (
     <Link href={href} className={className}>
       {label}
@@ -199,35 +155,16 @@ function Fact({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-white/10 bg-black/25 p-3">
       <dt className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500">{label}</dt>
-      <dd className="mt-1 truncate text-lg font-black text-white">{value}</dd>
+      <dd className="mt-1 truncate text-base font-black text-white sm:text-lg">{value}</dd>
     </div>
-  );
-}
-
-function InfoPanel({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="rounded-xl border border-white/10 bg-white/[0.045] p-4 shadow-xl shadow-black/15">
-      <h2 className="text-xs font-black uppercase tracking-[0.22em] text-lime-300">{title}</h2>
-      <div className="mt-3">{children}</div>
-    </section>
   );
 }
 
 function KeyValue({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-black/20 px-3 py-2.5">
+    <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5">
       <p className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500">{label}</p>
       <p className="mt-1 break-words font-semibold text-zinc-200">{value}</p>
-    </div>
-  );
-}
-
-function MiniFact({ label, value, tone }: { label: string; value: string; tone: "lime" | "amber" | "sky" | "zinc" }) {
-  const toneClass = tone === "lime" ? "text-lime-200" : tone === "amber" ? "text-amber-200" : tone === "sky" ? "text-sky-200" : "text-zinc-200";
-  return (
-    <div className="rounded-lg border border-white/10 bg-black/20 p-3">
-      <p className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500">{label}</p>
-      <p className={`mt-1 truncate text-lg font-black ${toneClass}`}>{value}</p>
     </div>
   );
 }

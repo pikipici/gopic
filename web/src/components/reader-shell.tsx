@@ -74,7 +74,7 @@ function ReaderPageImage({ page }: ReaderPageImageProps) {
   const resolvedUrl = resolvePageImageUrl(page.imageUrl);
 
   if (!page.imageUrl) {
-    return <PageFallback pageNumber={page.pageNumber} message="Image URL kosong dari source." />;
+    return <PageFallback pageNumber={page.pageNumber} message="Image URL halaman ini kosong." />;
   }
 
   if (failed) {

@@ -46,7 +46,7 @@ export function ContinueReadingCard({ seriesList }: { seriesList: SeriesSummary[
           Library
         </Link>
       </div>
-      <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
+      <div className="flex max-w-full gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
         {records.map(({ series, progress }) => (
           <ContinuePoster key={`${series.slug}-${progress.chapterSlug}`} series={series} progress={progress} />
         ))}
@@ -63,7 +63,7 @@ function ContinuePoster({ series, progress }: { series: SeriesSummary; progress:
   const dashOffset = circumference - (percent / 100) * circumference;
 
   return (
-    <Link href={`/series/${series.slug}/${progress.chapterSlug}`} className="group min-w-28 sm:min-w-32">
+    <Link href={`/series/${series.slug}/${progress.chapterSlug}`} className="group min-w-28 shrink-0 sm:min-w-32">
       <span className="relative block h-40 overflow-hidden rounded-lg border border-white/10 bg-zinc-950 sm:h-48">
         {series.coverUrl ? (
           <span className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105" style={{ backgroundImage: `url(${series.coverUrl})` }} />

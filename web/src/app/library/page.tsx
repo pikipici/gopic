@@ -18,7 +18,7 @@ export default async function LibraryPage() {
           <p className="text-sm font-black uppercase tracking-[0.25em] text-lime-300">Local library</p>
           <h1 className="mt-4 text-4xl font-black text-white sm:text-5xl">Reading progress</h1>
           <p className="mt-4 max-w-2xl text-zinc-400">
-            Progress baca disimpan di localStorage browser ini. Daftar series tetap dari API/imported catalog, jadi chapter KomikCast dan KomikIndo langsung bisa lanjut dibaca.
+            Progress baca disimpan di localStorage browser ini. Daftar series tetap dari catalog API, jadi chapter yang sudah tersedia bisa langsung lanjut dibaca.
           </p>
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
             <Stat label="Catalog" value={seriesList.length.toString()} />

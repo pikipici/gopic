@@ -55,8 +55,8 @@ function ChapterRow({ seriesSlug, chapter }: { seriesSlug: string; chapter: Chap
           {chapter.numberSort || "?"}
         </span>
         <span className="min-w-0">
-          <span className="block truncate text-sm font-bold text-white">{chapter.numberLabel} / {chapter.title || "Untitled chapter"}</span>
-          <span className="mt-1 block text-sm text-zinc-500">{formatDate(chapter.publishedAt)} / {chapter.pageCount} pages</span>
+          <span className="block truncate text-sm font-black text-white">{chapter.numberLabel} / {chapter.title || "Untitled chapter"}</span>
+          <span className="mt-1 block text-xs text-zinc-500">{formatDate(chapter.publishedAt)} / {chapter.pageCount} pages</span>
         </span>
       </div>
       <span className={`w-fit shrink-0 rounded-md border px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] ${progressClass}`}>{progressLabel}</span>
