@@ -65,23 +65,6 @@ export default async function Home() {
                 </p>
               )}
             </section>
-
-            <section className="rounded-lg border border-white/10 bg-[#111114] p-3">
-              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-sky-300">Source mix</p>
-              <div className="mt-2 space-y-1.5">
-                {sourceStats.map((source) => (
-                  <div key={source.id} className="flex items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2">
-                    <span className="text-sm font-bold text-zinc-200">{source.label}</span>
-                    <span className="rounded-md bg-white/10 px-2 py-1 text-xs font-black text-white">{source.count}</span>
-                  </div>
-                ))}
-                {metadataOnlyCount ? (
-                  <div className="rounded-lg border border-amber-200/20 bg-amber-200/10 px-3 py-2 text-sm text-amber-100">
-                    {metadataOnlyCount} title masih metadata-only.
-                  </div>
-                ) : null}
-              </div>
-            </section>
           </aside>
         </div>
       </section>
