@@ -287,10 +287,19 @@ function UpdateCard({ series, chapter, index }: { series: SeriesSummary; chapter
   return (
     <Link
       href={`/series/${series.slug}/${chapter.slug}`}
-      className="group grid grid-cols-[2.75rem_minmax(0,1fr)] gap-3 rounded-xl border border-white/10 bg-[linear-gradient(145deg,rgba(255,255,255,0.055),rgba(255,255,255,0.02))] p-3 transition hover:-translate-y-0.5 hover:border-lime-300/40 hover:bg-white/[0.07]"
+      className="group grid grid-cols-[3.5rem_minmax(0,1fr)] gap-3 rounded-xl border border-white/10 bg-[linear-gradient(145deg,rgba(255,255,255,0.055),rgba(255,255,255,0.02))] p-2.5 transition hover:-translate-y-0.5 hover:border-lime-300/40 hover:bg-white/[0.07]"
     >
-      <span className="flex aspect-square items-center justify-center rounded-lg bg-black/35 text-sm font-black text-lime-200 ring-1 ring-white/10 group-hover:bg-lime-300 group-hover:text-black">
-        {String(index).padStart(2, "0")}
+      <span className="relative h-20 overflow-hidden rounded-lg bg-zinc-950 ring-1 ring-white/10">
+        {series.coverUrl ? (
+          <span className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105" style={{ backgroundImage: `url(${series.coverUrl})` }} />
+        ) : (
+          <span className="absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_30%_20%,rgba(190,242,100,0.18),transparent_42%),#18181b] text-sm font-black text-zinc-500">
+            {series.title.slice(0, 1).toUpperCase()}
+          </span>
+        )}
+        <span className="absolute left-1.5 top-1.5 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-black text-lime-200 backdrop-blur">
+          {String(index).padStart(2, "0")}
+        </span>
       </span>
       <span className="min-w-0">
         <span className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">{sourceLabel(series.sourceId)} / {formatDate(chapter.publishedAt)}</span>
