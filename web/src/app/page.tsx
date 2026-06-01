@@ -16,14 +16,11 @@ export default async function Home() {
   ]);
 
   const readableSeries = allSeries.filter((series) => series.latestChapter && series.latestChapter.pageCount > 0);
-  const partialCount = allSeries.filter((series) => series.latestChapter && series.latestChapter.pageCount === 0).length;
-  const metadataOnlyCount = allSeries.filter((series) => !series.latestChapter).length;
   const heroSeries = pickHeroSeries(featured, readableSeries, allSeries);
   const trending = [...readableSeries].sort((a, b) => b.chapterCount - a.chapterCount).slice(0, 12);
   const recentlyAdded = allSeries.slice(0, 10);
   const recent = recentChapters.slice(0, 10);
   const genres = allGenres.slice(0, 14);
-  const sourceStats = buildSourceStats(allSeries);
 
   return (
     <main className="overflow-hidden bg-[#050506]">
@@ -120,16 +117,6 @@ export default async function Home() {
               )}
             </div>
           </section>
-
-          <section className="rounded-lg border border-white/10 bg-[#111114] p-3">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-300">Platform state</p>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <MiniStat label="Sources" value={sourceStats.length.toString()} />
-              <MiniStat label="Partial" value={partialCount.toString()} />
-              <MiniStat label="Genres" value={allGenres.length.toString()} />
-              <MiniStat label="Metadata" value={metadataOnlyCount.toString()} />
-            </div>
-          </section>
         </aside>
       </section>
 
@@ -156,17 +143,6 @@ function sourceLabel(sourceId?: string) {
   if (sourceId === "komikindo") return "KomikIndo";
   if (sourceId === "mock-mihon") return "Mock";
   return "Seed";
-}
-
-function buildSourceStats(seriesList: SeriesSummary[]) {
-  const counts = new Map<string, number>();
-  for (const series of seriesList) {
-    const id = series.sourceId ?? "seed";
-    counts.set(id, (counts.get(id) ?? 0) + 1);
-  }
-  return Array.from(counts.entries())
-    .map(([id, count]) => ({ id, count, label: sourceLabel(id) }))
-    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
 }
 
 function HeroFeature({ series }: { series: SeriesSummary }) {
@@ -305,15 +281,6 @@ function CompactSeriesLink({ series }: { series: SeriesSummary }) {
         <span className="mt-2 block text-xs text-zinc-500">{titleCase(series.status)} / {series.chapterCount} chapters</span>
       </span>
     </Link>
-  );
-}
-
-function MiniStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg border border-white/10 bg-black/20 p-3">
-      <p className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-500">{label}</p>
-      <p className="mt-1 text-xl font-black text-white">{value}</p>
-    </div>
   );
 }
 
