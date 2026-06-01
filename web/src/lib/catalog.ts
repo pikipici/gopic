@@ -56,16 +56,40 @@ async function fetchApi<T>(path: string): Promise<T | null> {
     return null;
   }
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+
   try {
-    const response = await fetch(`${apiBaseUrl}${path}`, { next: { revalidate: 30 } });
+    const response = await fetch(`${apiBaseUrl}${path}`, { next: { revalidate: 30 }, signal: controller.signal });
     if (!response.ok) {
       return null;
     }
     const envelope = (await response.json()) as ApiEnvelope<T>;
-    return envelope.error ? null : envelope.data;
+    return envelope.error ? null : normalizeApiData(envelope.data);
   } catch {
     return null;
+  } finally {
+    clearTimeout(timeout);
   }
+}
+
+function normalizeApiData<T>(data: T): T {
+  if (Array.isArray(data)) {
+    return data.map((item) => normalizeApiData(item)) as T;
+  }
+  if (!data || typeof data !== "object") {
+    return data;
+  }
+
+  const record = data as Record<string, unknown>;
+  if (record.chapter && typeof record.chapter === "object" && record.chapter !== null) {
+    const chapter = record.chapter as Partial<Chapter>;
+    record.chapter = { ...chapter, pages: chapter.pages ?? [] };
+  }
+  if (Array.isArray(record.chapters)) {
+    record.chapters = record.chapters.map((chapter) => normalizeApiData(chapter));
+  }
+  return record as T;
 }
 
 export async function getAllSeries(): Promise<SeriesSummary[]> {

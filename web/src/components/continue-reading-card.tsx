@@ -1,13 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getReadingProgress } from "@/lib/reading-progress";
 import type { SeriesSummary } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 
 export function ContinueReadingCard({ seriesList }: { seriesList: SeriesSummary[] }) {
-  const [progress] = useState(() => getReadingProgress()[0]);
+  const [progress, setProgress] = useState<ReturnType<typeof getReadingProgress>[number] | null>(null);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setProgress(getReadingProgress()[0] ?? null);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   const record = useMemo(() => {
     if (!progress) return null;

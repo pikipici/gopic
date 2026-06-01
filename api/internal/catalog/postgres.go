@@ -154,11 +154,12 @@ GROUP BY s.id, lc.slug, lc.number_label, lc.number_sort, lc.title, lc.published_
 	if err != nil {
 		return types.SeriesDetail{}, false, err
 	}
-	defer rows.Close()
 	if !rows.Next() {
+		rows.Close()
 		return types.SeriesDetail{}, false, rows.Err()
 	}
 	summary, err := scanSeriesSummary(rows.Scan)
+	rows.Close()
 	if err != nil {
 		return types.SeriesDetail{}, false, err
 	}
