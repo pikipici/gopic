@@ -31,16 +31,6 @@ export default async function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_0%,rgba(190,242,100,0.08),transparent_28%),linear-gradient(180deg,#0b0b0d_0%,#050506_82%)]" />
         <div className="relative mx-auto grid max-w-7xl gap-4 px-3 py-4 sm:px-4 lg:grid-cols-[minmax(0,1fr)_18rem] lg:px-6">
           <div className="space-y-3">
-            <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
-              <div className="min-w-0">
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-lime-300">Gomic</p>
-                <h1 className="mt-1 truncate text-2xl font-black text-white sm:text-3xl">Komik terbaru dan populer</h1>
-              </div>
-              <Link href="/series" className="shrink-0 rounded-md bg-lime-300 px-3 py-2 text-xs font-black uppercase tracking-[0.14em] text-black transition hover:bg-lime-200">
-                Catalog
-              </Link>
-            </div>
-
             {heroSeries ? <HeroFeature series={heroSeries} /> : <EmptyHero />}
 
             <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
