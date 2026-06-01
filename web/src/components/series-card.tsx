@@ -22,7 +22,7 @@ export function SeriesCard({ series }: { series: SeriesSummary }) {
   const readableLabel = hasPages ? "Ready" : latest ? "Partial" : "Metadata";
 
   return (
-    <article className="group overflow-hidden rounded-lg border border-white/10 bg-[#101013] shadow-lg shadow-black/25 transition duration-200 hover:-translate-y-0.5 hover:border-lime-300/35 hover:bg-[#151519]">
+    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-white/10 bg-[#101013] shadow-lg shadow-black/25 transition duration-200 hover:-translate-y-0.5 hover:border-lime-300/35 hover:bg-[#151519]">
       <Link href={`/series/${series.slug}`} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(190,242,100,0.22),transparent_35%),linear-gradient(135deg,#27272a,#09090b)]">
           {series.coverUrl ? (
@@ -48,7 +48,7 @@ export function SeriesCard({ series }: { series: SeriesSummary }) {
           </div>
         </div>
       </Link>
-      <div className="space-y-2.5 p-2.5">
+      <div className="flex flex-1 flex-col gap-2.5 p-2.5">
         <p className="line-clamp-2 min-h-9 text-xs leading-5 text-zinc-400">
           {series.synopsis || "Belum ada synopsis dari source ini."}
         </p>
@@ -63,6 +63,7 @@ export function SeriesCard({ series }: { series: SeriesSummary }) {
             <span className="rounded-md bg-white/5 px-2 py-1 text-[11px] text-zinc-500">No genres</span>
           )}
         </div>
+        <div className="mt-auto">
         {latest ? (
           hasPages ? (
             <Link
@@ -80,6 +81,7 @@ export function SeriesCard({ series }: { series: SeriesSummary }) {
         ) : (
           <div className="rounded-lg border border-white/10 bg-black/25 px-2.5 py-2 text-xs text-zinc-500">Belum ada chapter.</div>
         )}
+        </div>
       </div>
     </article>
   );
