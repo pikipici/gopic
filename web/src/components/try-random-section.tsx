@@ -15,7 +15,7 @@ export function TryRandomSection({ seriesList, limit = 10 }: TryRandomSectionPro
     const readable = seriesList.filter((series) => series.latestChapter && series.latestChapter.pageCount > 0);
     return readable.length ? readable : seriesList;
   }, [seriesList]);
-  const [seed, setSeed] = useState(() => Date.now());
+  const [seed, setSeed] = useState(0);
   const picks = useMemo(() => pickRandomSeries(candidates, limit, seed), [candidates, limit, seed]);
 
   if (!picks.length) {

@@ -85,7 +85,7 @@ ensure_clean_owned_port() {
   local label=$2
   local match=$3
   local pid command_line
-  pid=$(port_pid "$port" | sed -n '1p')
+  pid=$(port_pid "$port" | sed -n '1p' || true)
   if [ -z "${pid:-}" ]; then
     return 0
   fi
@@ -105,7 +105,7 @@ ensure_clean_owned_port() {
 
 ensure_clean_web_port() {
   local pid command_line web_dir_for_match web_dir_win_for_match
-  pid=$(port_pid "$WEB_PORT" | sed -n '1p')
+  pid=$(port_pid "$WEB_PORT" | sed -n '1p' || true)
   if [ -z "${pid:-}" ]; then
     return 0
   fi

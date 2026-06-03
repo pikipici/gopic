@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeaderShell } from "@/components/site-header-shell";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="pb-24 md:pb-0">
-        <SiteHeader />
+        <SiteHeaderShell />
         {children}
         <MobileBottomNav />
       </body>

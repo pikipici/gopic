@@ -120,34 +120,72 @@ Commit slicing recommendation:
 
 ## Priority 1 - Practical UX / Reliability
 
-- [ ] Admin job detail drawer/page
+- [x] Fixed: source import now caches remote cover images when image caching is enabled, preventing public homepage/detail covers from depending on short-lived signed MinIO/S3 URLs.
+  - Added `CacheCover()` to `api/internal/imagecache/cache.go`.
+  - `api/internal/sourceimport/service.go` now caches `Series.CoverURL` before persisting source metadata.
+  - Cover cache failures are tolerated so imports do not fail only because a cover host is slow/down.
+  - Added imagecache tests for remote cover caching and local cover passthrough.
+  - Admin import copy now says `Cache cover/pages locally`.
+  - Existing rows with already-expired cover URLs still need source sync/import after API restart to refresh persisted `coverUrl` values.
+  - Validation passed: `go test ./...` from `api/`, `npm run lint && npm run build` from `web/`.
+- [x] Admin job detail drawer/page
   - Show payload, source ID, series ID, progress, timestamps, and final error more clearly.
   - Keep secrets redacted.
-- [ ] Admin retry UX improvement
+- [x] Admin retry UX improvement
   - Separate retry button from noisy job cards.
   - Show retry source/title if payload has enough metadata.
-- [ ] Chapter/page partial state improvements
+- [x] Admin granular safe sync controls
+  - `metadataOnly`, `chapterLimit`, and `cachePages` are supported by backend sync endpoint.
+  - Admin UI defaults to metadata/cover-only sync to avoid accidentally caching full large series.
+  - Failed `source_sync` jobs can be retried with safe metadata-only defaults.
+- [x] Admin job history filters
+  - Added all/running/failed/completed tabs with counts and filter-specific empty states.
+- [x] Admin cover cache status
+  - Show whether an imported cover is served from local `/uploads/source-cache/...` or upstream URL.
+  - Add a sync hint/action for upstream or expired-looking covers.
+  - Implemented inferred badges for cached/upstream/no cover in admin series cards.
+  - Added `Sync cover` action for upstream linked series using metadata-only sync with `cachePages:false`.
+  - Validation passed: `npm run lint`, `npm run build`, and `/admin` smoke.
+- [x] Chapter/page partial state improvements
   - Mark imported chapters with `pageCount = 0` more explicitly in admin and public detail.
   - Add a clear "retry pages" concept later if backend supports it.
+  - Public chapter rows now label zero-page chapters as `Partial import` with a metadata-saved/pages-missing explanation.
+  - Series detail partial warning now includes partial count and admin sync/upload recovery guidance.
+  - Admin series cards warn when the latest imported chapter has `pageCount = 0`.
+  - Validation passed: `npm run lint`, `npm run build`, `/admin` smoke, and `/series/nighthawk-protocol` smoke.
 - [ ] Reader image fallback refinement
   - Add "open image in new tab" for failed pages.
   - Add copy URL button for failed image URLs.
-- [ ] Mobile visual QA deeper pass
+- [x] Mobile visual QA deeper pass
   - Test real phone widths around 360px, 390px, 430px.
   - Check admin cards, source preview, reader sticky controls, and bottom nav overlap.
+  - Tightened admin mobile spacing/radius, hero text scale, source preview wrapping, import preset grid behavior, job drawer padding, toast placement, and safe-area bottom padding.
+  - Tightened reader mobile controls: bottom toolbar wraps within viewport, double-page mode falls back to one page per screen on small widths, horizontal reader hint respects safe-area, layout drawer header wraps cleanly, and reader settings modal uses dynamic viewport height.
+  - Validation passed: `npm run lint`, `npm run build`, `/admin` smoke, and `/series/nighthawk-protocol/chapter-003` smoke.
 
 ## Priority 2 - Admin / Import Workflow
 
-- [ ] Admin source search presets
+- [x] Admin source search presets
   - Quick chips for KomikCast/KomikIndo sample queries.
-- [ ] Import safety presets
+- [x] Admin source availability panel + search presets
+  - Registered source adapter cards are rendered from `GET /api/v1/admin/sources`.
+  - Cards show `Available` or `Selected`; no fake live health is shown because backend has no source-health endpoint yet.
+  - Quick query preset chips fill source search for KomikCast, KomikIndo, mock source, and fallback sources.
+  - Validation passed: `npm run lint`, `npm run build`, and `/admin` smoke.
+- [x] Import safety presets
   - Buttons for metadata only, 1 chapter, 2 chapters, all chapters.
+  - Implemented in the source preview import panel using the existing `metadataOnly`, `chapterLimit`, and `cachePages` import options.
+  - Presets update the manual controls without adding backend behavior.
+  - Validation passed: `npm run lint`, `npm run build`, and `/admin` smoke.
 - [ ] Source status panel
   - Health indicator per source adapter.
   - Show source URL/port in a redacted-safe way.
-- [ ] Better failed job copy
+- [x] Better failed job copy
   - Convert raw timeout/errors into friendlier messages.
   - Preserve raw error in expanded detail.
+  - Implemented friendly summaries for timeout, API restart interruption, connection refused, DNS, auth, and not-found errors.
+  - Job detail drawer keeps the original backend message under `Raw message / error`.
+  - Validation passed: `npm run lint`, `npm run build`, and `/admin` smoke.
 - [ ] Add cancel job support later
   - Requires backend support; do not fake it in UI.
 
@@ -198,6 +236,19 @@ Commit slicing recommendation:
     - The redesign should improve perceived catalog activity even when data is partial.
     - Empty/loading/error states must remain graceful when the API is unavailable or catalog is sparse.
     - No proprietary `comix.to` assets, logos, exact copy, or pixel-perfect cloning.
+  - Latest revision notes:
+    - Reworked `/` away from a landing/hero-heavy layout into a denser comic-index dashboard.
+    - New composition uses compact top action strip, 3-column desktop shell, cover-led featured card, spotlight stack, hot update rows, catalog stats, genre chips, cover wall, and full update feed.
+    - Visual direction shifted from lime/marketing surfaces to zinc/cyan dark app surfaces closer to the current detail/reader brief.
+    - Still uses real Gomic catalog/chapter data only; no fake ratings, comments, follows, ranks, uploaders, or community modules.
+    - Touched `web/src/app/page.tsx` only in this revision.
+    - Validation passed: `npm run lint`, `npm run build` from `web/`.
+  - Playwright reference follow-up:
+    - Captured `comix.to` desktop/mobile screenshots to temp and extracted DOM/layout metrics because this model cannot inspect tool-returned images directly.
+    - Actual homepage pattern observed: 64px top nav, dark `#22282a` body, announcement block, then repeated sections with horizontal poster rails; cards are about `181x331`, poster area about `181x253`, rank overlay, chapter/time metadata, and compact title body.
+    - Reworked `/` again to follow that structure more directly: announcement panel, `Most Recent` poster rail, `Most Active · New Comics` poster rail, `Latest Updates` poster grid, and compact right-column discovery lists.
+    - Removed the previous big featured/hero/dashboard treatment because it did not match the captured reference.
+    - Validation passed again: `npm run lint`, `npm run build` from `web/`.
 - [ ] Series detail UI refresh inspired by `comix.to` title page
   - Use `https://comix.to/title/n8we-the-chick-class-hunter-is-filial` as the detail-page composition reference, without cloning assets, branding, exact copy, or CSS/HTML.
   - Reference findings from exploration:

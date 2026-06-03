@@ -50,6 +50,13 @@ func (c *Cache) CachePages(ctx context.Context, seriesSlug, chapterSlug string, 
 	return items, nil
 }
 
+func (c *Cache) CacheCover(ctx context.Context, seriesSlug, imageURL string) (string, error) {
+	if !isRemote(imageURL) {
+		return imageURL, nil
+	}
+	return c.cacheRemote(ctx, seriesSlug, "cover", types.ChapterPage{PageNumber: 1, ImageURL: imageURL})
+}
+
 func (c *Cache) cacheRemote(ctx context.Context, seriesSlug, chapterSlug string, page types.ChapterPage) (string, error) {
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, page.ImageURL, nil)
 	if err != nil {

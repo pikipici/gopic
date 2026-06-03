@@ -40,3 +40,34 @@ func TestCachePagesKeepsOriginalURLWhenDownloadFails(t *testing.T) {
 		t.Fatalf("successful download should be cached, got %q", pages[1].ImageURL)
 	}
 }
+
+func TestCacheCoverCachesRemoteURL(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "image/webp")
+		_, _ = w.Write([]byte("fake cover"))
+	}))
+	defer server.Close()
+
+	cache := New(filepath.Join(t.TempDir(), "uploads"))
+	coverURL, err := cache.CacheCover(context.Background(), "series", server.URL+"/cover.webp?X-Amz-Expires=86400")
+	if err != nil {
+		t.Fatalf("CacheCover returned error: %v", err)
+	}
+	if !strings.HasPrefix(coverURL, "/uploads/source-cache/series/cover/") {
+		t.Fatalf("successful cover download should be cached, got %q", coverURL)
+	}
+	if strings.Contains(coverURL, "X-Amz") {
+		t.Fatalf("cached cover URL should not keep signed query params, got %q", coverURL)
+	}
+}
+
+func TestCacheCoverKeepsLocalURL(t *testing.T) {
+	cache := New(filepath.Join(t.TempDir(), "uploads"))
+	coverURL, err := cache.CacheCover(context.Background(), "series", "/mock-covers/test.svg")
+	if err != nil {
+		t.Fatalf("CacheCover returned error: %v", err)
+	}
+	if coverURL != "/mock-covers/test.svg" {
+		t.Fatalf("local cover should be kept, got %q", coverURL)
+	}
+}

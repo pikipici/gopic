@@ -70,6 +70,10 @@ func (s *Service) SyncSeries(ctx context.Context, slug string) (Result, error) {
 }
 
 func (s *Service) SyncSeriesWithProgress(ctx context.Context, slug string, report ProgressFunc) (Result, error) {
+	return s.SyncSeriesWithOptions(ctx, slug, DefaultImportOptions(), report)
+}
+
+func (s *Service) SyncSeriesWithOptions(ctx context.Context, slug string, options ImportOptions, report ProgressFunc) (Result, error) {
 	reportProgress(report, 12, "Loading linked series "+slug)
 	detail, ok, err := s.catalog.Detail(ctx, slug)
 	if err != nil {
@@ -81,7 +85,7 @@ func (s *Service) SyncSeriesWithProgress(ctx context.Context, slug string, repor
 	if detail.SourceID == "" || detail.SourceSeriesID == "" {
 		return Result{}, ErrSeriesNotLinked
 	}
-	return s.ImportWithProgress(ctx, detail.SourceID, detail.SourceSeriesID, report)
+	return s.ImportWithOptions(ctx, detail.SourceID, detail.SourceSeriesID, options, report)
 }
 
 func (s *Service) importFromSource(ctx context.Context, item source.Source, id string, options ImportOptions, report ProgressFunc) (Result, error) {
@@ -91,6 +95,11 @@ func (s *Service) importFromSource(ctx context.Context, item source.Source, id s
 		return Result{}, err
 	}
 	imported.Chapters = selectChapters(imported.Chapters, options.ChapterLimit)
+	if s.cache != nil && options.CachePages {
+		if coverURL, err := s.cache.CacheCover(ctx, imported.Series.Slug, imported.Series.CoverURL); err == nil {
+			imported.Series.CoverURL = coverURL
+		}
+	}
 	reportProgress(report, 25, "Saving series "+imported.Series.Slug)
 	series, err := s.admin.UpsertSeries(ctx, imported.Series)
 	if err != nil {
