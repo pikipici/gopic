@@ -18,6 +18,7 @@ type ChapterInput = {
 };
 
 type SourceSummary = { id: string; name: string; kind?: string; baseUrl?: string; enabled?: boolean; capabilities?: string[]; lastError?: string; updatedAt?: string };
+type AvailableSourceExtension = { id: string; name: string; kind: string; baseUrl: string; description: string; language: string; version?: string; author?: string; homepage?: string; capabilities: string[] };
 type SourceExtensionForm = { id: string; name: string; baseUrl: string; enabled: boolean; headersJSON: string; editingID: string };
 type SourceStatus = { id: string; name: string; healthy: boolean; message: string; enabled: boolean };
 type SourceResult = { sourceId: string; id: string; title: string; url: string; coverUrl: string };
@@ -201,6 +202,7 @@ export default function AdminPage() {
   const [savedToken, setSavedToken] = useState("");
   const [series, setSeries] = useState<SeriesSummary[]>([]);
   const [sources, setSources] = useState<SourceSummary[]>([]);
+  const [availableSources, setAvailableSources] = useState<AvailableSourceExtension[]>([]);
   const [sourceStatuses, setSourceStatuses] = useState<Record<string, SourceStatus>>({});
   const [sourceForm, setSourceForm] = useState<SourceExtensionForm>(() => emptyExtensionForm());
   const [activeSourceId, setActiveSourceId] = useState("");
@@ -279,6 +281,12 @@ export default function AdminPage() {
       if (current && data.some((item) => item.id === current && sourceEnabled(item))) return current;
       return data.find(sourceEnabled)?.id || data[0]?.id || "";
     });
+    return data;
+  }, [savedToken]);
+
+  const loadAvailableSources = useCallback(async (authToken = savedToken) => {
+    const data = await adminFetch<AvailableSourceExtension[]>("/api/v1/admin/extensions/catalog", authToken);
+    setAvailableSources(data);
     return data;
   }, [savedToken]);
 
@@ -505,6 +513,24 @@ export default function AdminPage() {
     }
   }
 
+  async function handleSourceInstall(extensionID: string) {
+    setBusy(true);
+    try {
+      const installed = await adminFetch<SourceSummary>(`/api/v1/admin/extensions/catalog/${extensionID}/install`, savedToken, { method: "POST" });
+      const loaded = await loadSources(savedToken);
+      setActiveSourceId(installed.enabled === false ? loaded.find(sourceEnabled)?.id || installed.id : installed.id);
+      await loadSourceStatus(installed.id, savedToken);
+      setMessage(`${installed.name} installed. Source sudah bisa dipilih untuk search/import.`);
+      pushToast({ tone: "success", title: "Source installed", message: installed.name });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Gagal install source extension.";
+      setMessage(errorMessage);
+      pushToast({ tone: "error", title: "Install failed", message: errorMessage });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleSourceDelete(source: SourceSummary) {
     if (!window.confirm(`Delete source ${source.name}? Imported series yang sudah link ke source ini tidak ikut dihapus.`)) return;
     setBusy(true);
@@ -609,6 +635,7 @@ export default function AdminPage() {
       window.localStorage.setItem("gomic-admin-token", envelope.data.token);
       setSavedToken(envelope.data.token);
       setMessage("Login sukses. Loading series dan source...");
+      await loadAvailableSources(envelope.data.token);
       const loadedSources = await loadSources(envelope.data.token);
       await loadSourceStatuses(loadedSources, envelope.data.token);
       await loadSeries(envelope.data.token);
@@ -708,6 +735,7 @@ export default function AdminPage() {
   };
   const emptyJobMessage = jobFilter === "all" ? "Belum ada job. Import atau sync source dulu." : `Tidak ada ${jobFilter} job di recent window.`;
   const activeSourceName = sources.find((item) => item.id === activeSourceId)?.name ?? (activeSourceId || "No source");
+  const installedSourceIDs = new Set(sources.map((item) => item.id));
   const activeSourcePresets = presetsForSource(activeSourceId);
   const activeJobSeriesID = jobSeriesID(activeJob);
   const activeJobLatestChapter = activeJobSeriesID ? series.find((item) => item.slug === activeJobSeriesID)?.latestChapter?.slug : undefined;
@@ -868,6 +896,49 @@ export default function AdminPage() {
           </div>
         </div>
         <div className="mt-5 rounded-3xl border border-white/10 bg-black/20 p-4">
+          <div className="rounded-3xl border border-lime-300/20 bg-lime-300/[0.06] p-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-lime-200">Available extensions</p>
+                <h3 className="mt-1 font-black">Install source dari catalog</h3>
+                <p className="mt-1 text-xs text-muted">Pilih source seperti extension repo Mihon. Setelah install, source masuk ke dropdown search/import.</p>
+              </div>
+              <button onClick={() => void loadAvailableSources()} disabled={!savedToken || busy} className="rounded-full border border-lime-200/30 px-3 py-2 text-xs font-black text-lime-100 transition hover:bg-lime-200 hover:text-black disabled:opacity-40">
+                Refresh catalog
+              </button>
+            </div>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {availableSources.map((extension) => {
+                const installed = installedSourceIDs.has(extension.id);
+                return (
+                  <article key={extension.id} className="rounded-2xl border border-white/10 bg-black/25 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h4 className="truncate font-black">{extension.name}</h4>
+                        <p className="mt-1 font-mono text-[0.65rem] text-muted">{extension.id} · {extension.language || "unknown"} · v{extension.version || "?"}</p>
+                      </div>
+                      <span className={`rounded-full px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.18em] ring-1 ${installed ? "bg-lime-300/15 text-lime-200 ring-lime-300/20" : "bg-sky-200/15 text-sky-100 ring-sky-200/20"}`}>
+                        {installed ? "Installed" : "Available"}
+                      </span>
+                    </div>
+                    <p className="mt-3 line-clamp-2 text-sm text-muted">{extension.description}</p>
+                    <div className="mt-3 flex flex-wrap gap-2 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-muted">
+                      {extension.author ? <span className="rounded-full bg-white/10 px-2 py-1">{extension.author}</span> : null}
+                      <span className="rounded-full bg-white/10 px-2 py-1">{extension.kind}</span>
+                      {extension.homepage ? <span className="rounded-full bg-white/10 px-2 py-1">Repo source</span> : null}
+                    </div>
+                    <p className="mt-3 truncate font-mono text-[0.65rem] text-muted">{extension.baseUrl}</p>
+                    {extension.capabilities.length ? <p className="mt-3 text-xs text-muted">Capabilities: {extension.capabilities.join(", ")}</p> : null}
+                    <button type="button" onClick={() => void handleSourceInstall(extension.id)} disabled={!savedToken || busy || installed} className="mt-4 rounded-xl bg-lime-200 px-4 py-2 text-xs font-black text-black transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50">
+                      {installed ? "Installed" : "Install"}
+                    </button>
+                  </article>
+                );
+              })}
+              {availableSources.length === 0 ? <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-muted">Catalog belum loaded. Login atau klik refresh catalog.</p> : null}
+            </div>
+          </div>
+          
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-sky-200">Source availability</p>
