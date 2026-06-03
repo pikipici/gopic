@@ -25,6 +25,7 @@ type Config struct {
 	SourceURL       string
 	SourceHeaders   map[string]string
 	Sources         []SourceConfig
+	CatalogPath     string
 	ImageHeaders    map[string]string
 	CleanupInterval time.Duration
 	JobRetention    time.Duration
@@ -53,6 +54,10 @@ func Load() Config {
 	cfg.SourceURL = os.Getenv("SOURCE_URL")
 	cfg.SourceHeaders = parseHeaders(os.Getenv("SOURCE_HEADERS"))
 	cfg.Sources = parseSources(os.Getenv("SOURCES_JSON"))
+	cfg.CatalogPath = strings.TrimSpace(os.Getenv("EXTENSION_CATALOG_PATH"))
+	if cfg.CatalogPath == "" {
+		cfg.CatalogPath = "./extension-catalog.json"
+	}
 	if cfg.SourceURL != "" {
 		cfg.Sources = append(cfg.Sources, SourceConfig{ID: cfg.SourceID, Name: cfg.SourceName, URL: cfg.SourceURL, Headers: cfg.SourceHeaders})
 	}

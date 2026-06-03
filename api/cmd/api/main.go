@@ -123,7 +123,7 @@ func main() {
 		}
 	}
 
-	handler := httpapi.NewHandler(repo, httpapi.WithAdminToken(cfg.AdminToken), httpapi.WithUploadDir(cfg.UploadDir), httpapi.WithJobStore(jobStore), httpapi.WithSourceRegistry(sourceRegistry), httpapi.WithImageHeaders(cfg.ImageHeaders))
+	handler := httpapi.NewHandler(repo, httpapi.WithAdminToken(cfg.AdminToken), httpapi.WithUploadDir(cfg.UploadDir), httpapi.WithExtensionCatalogPath(cfg.CatalogPath), httpapi.WithJobStore(jobStore), httpapi.WithSourceRegistry(sourceRegistry), httpapi.WithImageHeaders(cfg.ImageHeaders))
 
 	httpapi.StartCleanupLoop(ctx, jobStore, imagecache.NewWithHeaders(cfg.UploadDir, cfg.ImageHeaders), httpapi.CleanupOptions{
 		Interval:     cfg.CleanupInterval,

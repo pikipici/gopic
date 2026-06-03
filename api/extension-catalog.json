@@ -1,0 +1,32 @@
+{
+  "name": "Gomic Local Extension Repository",
+  "updatedAt": "2026-06-03T18:03:00+07:00",
+  "extensions": [
+    {
+      "id": "komikcast",
+      "name": "KomikCast",
+      "kind": "json-http",
+      "baseUrl": "http://localhost:19190",
+      "description": "Adapter scraper KomikCast untuk search, detail, import metadata, chapter pages, dan health check.",
+      "language": "id",
+      "version": "1.0.0",
+      "author": "Gomic",
+      "homepage": "https://komikcast.ch",
+      "capabilities": ["search", "detail", "import", "pages", "health"],
+      "config": {}
+    },
+    {
+      "id": "komikindo",
+      "name": "KomikIndo",
+      "kind": "json-http",
+      "baseUrl": "http://localhost:19191",
+      "description": "Adapter scraper KomikIndo untuk search, detail, import metadata, chapter pages, dan health check.",
+      "language": "id",
+      "version": "1.0.0",
+      "author": "Gomic",
+      "homepage": "https://komikindo.ch",
+      "capabilities": ["search", "detail", "import", "pages", "health"],
+      "config": {}
+    }
+  ]
+}

@@ -269,6 +269,73 @@ func TestAdminDynamicJSONHTTPExtensionLifecycle(t *testing.T) {
 	}
 }
 
+func TestAdminExtensionCatalogInstall(t *testing.T) {
+	repo := catalog.NewRepository(seed.Series())
+	catalogPath := writeTestExtensionCatalog(t, "http://localhost:19190")
+	handler := NewHandler(repo, WithAdminToken("dev-token"), WithExtensionCatalogPath(catalogPath)).Routes()
+
+	catalogRecorder := httptest.NewRecorder()
+	catalogRequest := httptest.NewRequest(http.MethodGet, "/api/v1/admin/extensions/catalog", nil)
+	catalogRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(catalogRecorder, catalogRequest)
+	if catalogRecorder.Code != http.StatusOK {
+		t.Fatalf("expected catalog list 200, got %d body=%s", catalogRecorder.Code, catalogRecorder.Body.String())
+	}
+	if !bytes.Contains(catalogRecorder.Body.Bytes(), []byte("komikcast")) {
+		t.Fatalf("expected catalog to include komikcast, body=%s", catalogRecorder.Body.String())
+	}
+
+	installRecorder := httptest.NewRecorder()
+	installRequest := httptest.NewRequest(http.MethodPost, "/api/v1/admin/extensions/catalog/komikcast/install", nil)
+	installRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(installRecorder, installRequest)
+	if installRecorder.Code != http.StatusCreated {
+		t.Fatalf("expected catalog install 201, got %d body=%s", installRecorder.Code, installRecorder.Body.String())
+	}
+
+	listRecorder := httptest.NewRecorder()
+	listRequest := httptest.NewRequest(http.MethodGet, "/api/v1/admin/extensions", nil)
+	listRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(listRecorder, listRequest)
+	if listRecorder.Code != http.StatusOK || !bytes.Contains(listRecorder.Body.Bytes(), []byte("KomikCast")) {
+		t.Fatalf("expected installed extension in list, got %d body=%s", listRecorder.Code, listRecorder.Body.String())
+	}
+
+	statusRecorder := httptest.NewRecorder()
+	statusRequest := httptest.NewRequest(http.MethodGet, "/api/v1/admin/extensions/komikcast/status", nil)
+	statusRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(statusRecorder, statusRequest)
+	if statusRecorder.Code != http.StatusOK {
+		t.Fatalf("expected installed catalog status 200, got %d body=%s", statusRecorder.Code, statusRecorder.Body.String())
+	}
+}
+
+func writeTestExtensionCatalog(t *testing.T, baseURL string) string {
+	t.Helper()
+	path := t.TempDir() + "/extension-catalog.json"
+	body := `{
+		"name":"Test Extension Repository",
+		"updatedAt":"2026-06-03T18:03:00+07:00",
+		"extensions":[{
+			"id":"komikcast",
+			"name":"KomikCast",
+			"kind":"json-http",
+			"baseUrl":"` + baseURL + `",
+			"description":"Test catalog item",
+			"language":"id",
+			"version":"1.0.0",
+			"author":"Gomic",
+			"homepage":"https://example.test",
+			"capabilities":["search","detail","import","pages","health"],
+			"config":{}
+		}]
+	}`
+	if err := os.WriteFile(path, []byte(body), 0o600); err != nil {
+		t.Fatalf("write extension catalog: %v", err)
+	}
+	return path
+}
+
 func TestAdminSyncSourceRejectsDisabledExtension(t *testing.T) {
 	repo := catalog.NewRepository(seed.Series())
 	_, err := repo.UpsertSourceExtension(context.Background(), types.SourceExtensionInput{

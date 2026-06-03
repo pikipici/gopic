@@ -143,6 +143,26 @@ type SourceExtensionInput struct {
 	LastError    string         `json:"lastError"`
 }
 
+type AvailableSourceExtension struct {
+	ID           string         `json:"id"`
+	Name         string         `json:"name"`
+	Kind         string         `json:"kind"`
+	BaseURL      string         `json:"baseUrl"`
+	Description  string         `json:"description"`
+	Language     string         `json:"language"`
+	Version      string         `json:"version"`
+	Author       string         `json:"author"`
+	Homepage     string         `json:"homepage"`
+	Capabilities []string       `json:"capabilities"`
+	Config       map[string]any `json:"config"`
+}
+
+type SourceExtensionCatalog struct {
+	Name       string                     `json:"name"`
+	UpdatedAt  string                     `json:"updatedAt"`
+	Extensions []AvailableSourceExtension `json:"extensions"`
+}
+
 type SourceExtensionPatch struct {
 	Name         *string        `json:"name"`
 	Kind         *string        `json:"kind"`

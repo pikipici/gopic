@@ -31,6 +31,7 @@ type Handler struct {
 	adminRepo    catalog.AdminStore
 	adminToken   string
 	uploadDir    string
+	catalogPath  string
 	imageHeaders map[string]string
 	sources      *source.Registry
 	jobs         jobs.Store
@@ -48,7 +49,7 @@ type apiError struct {
 }
 
 func NewHandler(repo catalog.Store, options ...Option) *Handler {
-	h := &Handler{repo: repo, uploadDir: "./uploads", sources: source.NewRegistry(source.NewMockSource()), jobs: jobs.NewStore()}
+	h := &Handler{repo: repo, uploadDir: "./uploads", catalogPath: "./extension-catalog.json", sources: source.NewRegistry(source.NewMockSource()), jobs: jobs.NewStore()}
 	if adminRepo, ok := repo.(catalog.AdminStore); ok {
 		h.adminRepo = adminRepo
 	}
@@ -70,6 +71,14 @@ func WithUploadDir(dir string) Option {
 	return func(h *Handler) {
 		if dir != "" {
 			h.uploadDir = dir
+		}
+	}
+}
+
+func WithExtensionCatalogPath(path string) Option {
+	return func(h *Handler) {
+		if strings.TrimSpace(path) != "" {
+			h.catalogPath = path
 		}
 	}
 }
@@ -112,6 +121,8 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("POST /api/v1/admin/series", h.requireAdmin(h.adminSeriesUpsert))
 	mux.HandleFunc("GET /api/v1/admin/extensions", h.requireAdmin(h.adminExtensionsList))
 	mux.HandleFunc("POST /api/v1/admin/extensions", h.requireAdmin(h.adminExtensionCreate))
+	mux.HandleFunc("GET /api/v1/admin/extensions/catalog", h.requireAdmin(h.adminExtensionCatalogList))
+	mux.HandleFunc("POST /api/v1/admin/extensions/catalog/{extensionID}/install", h.requireAdmin(h.adminExtensionCatalogInstall))
 	mux.HandleFunc("GET /api/v1/admin/extensions/{sourceID}/status", h.requireAdmin(h.adminExtensionStatus))
 	mux.HandleFunc("PATCH /api/v1/admin/extensions/{sourceID}", h.requireAdmin(h.adminExtensionPatch))
 	mux.HandleFunc("DELETE /api/v1/admin/extensions/{sourceID}", h.requireAdmin(h.adminExtensionDelete))
@@ -281,6 +292,51 @@ func (h *Handler) adminExtensionCreate(w http.ResponseWriter, r *http.Request) {
 	writeEnvelope(w, http.StatusCreated, item, map[string]any{})
 }
 
+func (h *Handler) adminExtensionCatalogList(w http.ResponseWriter, r *http.Request) {
+	items, err := h.availableExtensions()
+	if err != nil {
+		writeError(w, http.StatusBadGateway, "catalog_unavailable", err.Error())
+		return
+	}
+	writeEnvelope(w, http.StatusOK, items, map[string]any{"total": len(items)})
+}
+
+func (h *Handler) adminExtensionCatalogInstall(w http.ResponseWriter, r *http.Request) {
+	if h.adminRepo == nil {
+		writeError(w, http.StatusServiceUnavailable, "admin_unavailable", "admin repository is not available")
+		return
+	}
+	available, ok, err := h.availableExtension(r.PathValue("extensionID"))
+	if err != nil {
+		writeError(w, http.StatusBadGateway, "catalog_unavailable", err.Error())
+		return
+	}
+	if !ok {
+		writeError(w, http.StatusNotFound, "not_found", "extension catalog item not found")
+		return
+	}
+	input := normalizeExtensionInput(types.SourceExtensionInput{
+		ID:           available.ID,
+		Name:         available.Name,
+		Kind:         available.Kind,
+		BaseURL:      available.BaseURL,
+		Enabled:      true,
+		Capabilities: available.Capabilities,
+		Config:       available.Config,
+	})
+	if err := validateExtensionInput(input); err != nil {
+		writeError(w, http.StatusBadRequest, "bad_request", err.Error())
+		return
+	}
+	item, err := h.adminRepo.UpsertSourceExtension(r.Context(), input)
+	if err != nil {
+		writeRepoError(w, err)
+		return
+	}
+	h.registerRuntimeExtension(item)
+	writeEnvelope(w, http.StatusCreated, item, map[string]any{})
+}
+
 func (h *Handler) adminExtensionPatch(w http.ResponseWriter, r *http.Request) {
 	if h.adminRepo == nil {
 		writeError(w, http.StatusServiceUnavailable, "admin_unavailable", "admin repository is not available")
@@ -333,6 +389,90 @@ func (h *Handler) adminExtensionDelete(w http.ResponseWriter, r *http.Request) {
 }
 
 var sourceExtensionIDPattern = regexp.MustCompile(`^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$`)
+
+func (h *Handler) availableExtensions() ([]types.AvailableSourceExtension, error) {
+	data, err := h.readExtensionCatalog()
+	if err != nil {
+		return nil, err
+	}
+	var catalogIndex types.SourceExtensionCatalog
+	if err := json.Unmarshal(data, &catalogIndex); err != nil {
+		return nil, fmt.Errorf("extension catalog is invalid")
+	}
+	items := make([]types.AvailableSourceExtension, 0, len(catalogIndex.Extensions))
+	seen := map[string]bool{}
+	for _, item := range catalogIndex.Extensions {
+		input := normalizeExtensionInput(types.SourceExtensionInput{
+			ID:           item.ID,
+			Name:         item.Name,
+			Kind:         item.Kind,
+			BaseURL:      item.BaseURL,
+			Enabled:      true,
+			Capabilities: item.Capabilities,
+			Config:       item.Config,
+		})
+		if seen[input.ID] || validateExtensionInput(input) != nil {
+			continue
+		}
+		seen[input.ID] = true
+		item.ID = input.ID
+		item.Name = input.Name
+		item.Kind = input.Kind
+		item.BaseURL = input.BaseURL
+		item.Capabilities = input.Capabilities
+		if item.Config == nil {
+			item.Config = map[string]any{}
+		}
+		items = append(items, item)
+	}
+	sort.Slice(items, func(i, j int) bool {
+		if items[i].Language != items[j].Language {
+			return items[i].Language < items[j].Language
+		}
+		return items[i].Name < items[j].Name
+	})
+	return items, nil
+}
+
+func (h *Handler) readExtensionCatalog() ([]byte, error) {
+	if strings.HasPrefix(h.catalogPath, "http://") || strings.HasPrefix(h.catalogPath, "https://") {
+		request, err := http.NewRequest(http.MethodGet, h.catalogPath, nil)
+		if err != nil {
+			return nil, fmt.Errorf("extension catalog URL is invalid")
+		}
+		response, err := http.DefaultClient.Do(request)
+		if err != nil {
+			return nil, fmt.Errorf("extension catalog cannot be fetched")
+		}
+		defer response.Body.Close()
+		if response.StatusCode < 200 || response.StatusCode >= 300 {
+			return nil, fmt.Errorf("extension catalog returned %d", response.StatusCode)
+		}
+		data, err := io.ReadAll(io.LimitReader(response.Body, 1024*1024))
+		if err != nil {
+			return nil, fmt.Errorf("extension catalog cannot be read")
+		}
+		return data, nil
+	}
+	data, err := os.ReadFile(h.catalogPath)
+	if err != nil {
+		return nil, fmt.Errorf("extension catalog cannot be read")
+	}
+	return data, nil
+}
+
+func (h *Handler) availableExtension(extensionID string) (types.AvailableSourceExtension, bool, error) {
+	items, err := h.availableExtensions()
+	if err != nil {
+		return types.AvailableSourceExtension{}, false, err
+	}
+	for _, item := range items {
+		if item.ID == extensionID {
+			return item, true, nil
+		}
+	}
+	return types.AvailableSourceExtension{}, false, nil
+}
 
 func normalizeExtensionInput(input types.SourceExtensionInput) types.SourceExtensionInput {
 	input.ID = strings.TrimSpace(input.ID)
