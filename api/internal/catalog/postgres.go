@@ -281,6 +281,20 @@ ORDER BY name ASC`)
 	return items, rows.Err()
 }
 
+func (r *PostgresRepository) GetSourceExtension(ctx context.Context, id string) (types.SourceExtension, bool, error) {
+	item, err := querySourceExtension(ctx, r.pool.QueryRow(ctx, `
+SELECT id, name, kind, base_url, enabled, capabilities, config, last_error, updated_at::text
+FROM admin_source_extensions
+WHERE id = $1`, id))
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return types.SourceExtension{}, false, nil
+		}
+		return types.SourceExtension{}, false, err
+	}
+	return item, true, nil
+}
+
 func (r *PostgresRepository) UpsertSourceExtension(ctx context.Context, input types.SourceExtensionInput) (types.SourceExtension, error) {
 	input.ID = strings.TrimSpace(input.ID)
 	input.Name = strings.TrimSpace(input.Name)
@@ -289,6 +303,9 @@ func (r *PostgresRepository) UpsertSourceExtension(ctx context.Context, input ty
 	}
 	if input.Kind == "" {
 		input.Kind = "json-http"
+	}
+	if input.Config == nil {
+		input.Config = map[string]any{}
 	}
 	configBytes, err := json.Marshal(input.Config)
 	if err != nil {
@@ -308,21 +325,33 @@ RETURNING id, name, kind, base_url, enabled, capabilities, config, last_error, u
 }
 
 func (r *PostgresRepository) UpdateSourceExtension(ctx context.Context, id string, patch types.SourceExtensionPatch) (types.SourceExtension, bool, error) {
-	current, err := querySourceExtension(ctx, r.pool.QueryRow(ctx, `
-SELECT id, name, kind, base_url, enabled, capabilities, config, last_error, updated_at::text
-FROM admin_source_extensions
-WHERE id = $1`, id))
-	if err != nil {
-		if err == pgx.ErrNoRows {
-			return types.SourceExtension{}, false, nil
-		}
-		return types.SourceExtension{}, false, err
+	current, ok, err := r.GetSourceExtension(ctx, id)
+	if err != nil || !ok {
+		return types.SourceExtension{}, ok, err
+	}
+	if patch.Name != nil {
+		current.Name = strings.TrimSpace(*patch.Name)
+	}
+	if patch.Kind != nil {
+		current.Kind = strings.TrimSpace(*patch.Kind)
+	}
+	if patch.BaseURL != nil {
+		current.BaseURL = strings.TrimSpace(*patch.BaseURL)
 	}
 	if patch.Enabled != nil {
 		current.Enabled = *patch.Enabled
 	}
+	if patch.Capabilities != nil {
+		current.Capabilities = *patch.Capabilities
+	}
 	if patch.Config != nil {
 		current.Config = patch.Config
+	}
+	if current.ID == "" || current.Name == "" {
+		return types.SourceExtension{}, false, ErrInvalidSourceExtensionInput
+	}
+	if current.Kind == "" {
+		current.Kind = "json-http"
 	}
 	configBytes, err := json.Marshal(current.Config)
 	if err != nil {
@@ -330,10 +359,18 @@ WHERE id = $1`, id))
 	}
 	updated, err := querySourceExtension(ctx, r.pool.QueryRow(ctx, `
 UPDATE admin_source_extensions
-SET enabled = $2, config = COALESCE($3::jsonb, '{}'::jsonb), updated_at = now()
+SET name = $2, kind = $3, base_url = $4, enabled = $5, capabilities = $6, config = COALESCE($7::jsonb, '{}'::jsonb), updated_at = now()
 WHERE id = $1
-RETURNING id, name, kind, base_url, enabled, capabilities, config, last_error, updated_at::text`, id, current.Enabled, string(configBytes)))
+RETURNING id, name, kind, base_url, enabled, capabilities, config, last_error, updated_at::text`, id, current.Name, current.Kind, current.BaseURL, current.Enabled, current.Capabilities, string(configBytes)))
 	return updated, true, err
+}
+
+func (r *PostgresRepository) DeleteSourceExtension(ctx context.Context, id string) (bool, error) {
+	tag, err := r.pool.Exec(ctx, `DELETE FROM admin_source_extensions WHERE id = $1`, id)
+	if err != nil {
+		return false, err
+	}
+	return tag.RowsAffected() > 0, nil
 }
 
 func (r *PostgresRepository) UpsertSeries(ctx context.Context, input types.SeriesInput) (types.SeriesDetail, error) {

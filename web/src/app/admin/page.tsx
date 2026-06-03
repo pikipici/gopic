@@ -18,6 +18,7 @@ type ChapterInput = {
 };
 
 type SourceSummary = { id: string; name: string; kind?: string; baseUrl?: string; enabled?: boolean; capabilities?: string[]; lastError?: string; updatedAt?: string };
+type SourceExtensionForm = { id: string; name: string; baseUrl: string; enabled: boolean; headersJSON: string; editingID: string };
 type SourceStatus = { id: string; name: string; healthy: boolean; message: string; enabled: boolean };
 type SourceResult = { sourceId: string; id: string; title: string; url: string; coverUrl: string };
 type SourceDetail = SourceResult & { synopsis: string; type: string; status: string; authorName: string; artistName: string; releaseYear: number; genres: string[]; chapterCount: number };
@@ -151,6 +152,27 @@ function sourceHealthLabel(source: SourceSummary, status?: SourceStatus) {
   return status.healthy ? "Healthy" : "Unhealthy";
 }
 
+function extensionFormFromSource(source: SourceSummary): SourceExtensionForm {
+  return { id: source.id, name: source.name, baseUrl: source.baseUrl ?? "", enabled: sourceEnabled(source), headersJSON: "{}", editingID: source.id };
+}
+
+function emptyExtensionForm(): SourceExtensionForm {
+  return { id: "", name: "", baseUrl: "", enabled: true, headersJSON: "{}", editingID: "" };
+}
+
+function parseHeadersJSON(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === "{}") return undefined;
+  const parsed = JSON.parse(trimmed) as unknown;
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Headers config harus object JSON.");
+  const headers: Record<string, string> = {};
+  for (const [key, item] of Object.entries(parsed)) {
+    if (typeof item !== "string") throw new Error("Header values harus string.");
+    if (key.trim() && item) headers[key.trim()] = item;
+  }
+  return Object.keys(headers).length > 0 ? headers : undefined;
+}
+
 async function adminFetch<T>(path: string, token: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${apiBaseUrl}${path}`, {
     ...init,
@@ -180,6 +202,7 @@ export default function AdminPage() {
   const [series, setSeries] = useState<SeriesSummary[]>([]);
   const [sources, setSources] = useState<SourceSummary[]>([]);
   const [sourceStatuses, setSourceStatuses] = useState<Record<string, SourceStatus>>({});
+  const [sourceForm, setSourceForm] = useState<SourceExtensionForm>(() => emptyExtensionForm());
   const [activeSourceId, setActiveSourceId] = useState("");
   const [sourceQuery, setSourceQuery] = useState("neon");
   const [sourceResults, setSourceResults] = useState<SourceResult[]>([]);
@@ -442,6 +465,65 @@ export default function AdminPage() {
       const errorMessage = error instanceof Error ? error.message : "Gagal update source extension.";
       setMessage(errorMessage);
       pushToast({ tone: "error", title: "Source update failed", message: errorMessage });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleSourceExtensionSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    try {
+      const headers = parseHeadersJSON(sourceForm.headersJSON);
+      const payload: Record<string, unknown> = {
+        name: sourceForm.name,
+        baseUrl: sourceForm.baseUrl,
+        enabled: sourceForm.enabled,
+      };
+      if (headers) payload.config = { headers };
+      const editing = Boolean(sourceForm.editingID);
+      if (!editing) {
+        payload.id = sourceForm.id;
+        payload.kind = "json-http";
+      }
+      const updated = await adminFetch<SourceSummary>(editing ? `/api/v1/admin/extensions/${sourceForm.editingID}` : "/api/v1/admin/extensions", savedToken, {
+        method: editing ? "PATCH" : "POST",
+        body: JSON.stringify(payload),
+      });
+      const loaded = await loadSources(savedToken);
+      setActiveSourceId(updated.enabled === false ? loaded.find(sourceEnabled)?.id || updated.id : updated.id);
+      setSourceForm(emptyExtensionForm());
+      await loadSourceStatus(updated.id, savedToken);
+      setMessage(`${updated.name} ${editing ? "updated" : "created"}.`);
+      pushToast({ tone: "success", title: editing ? "Source updated" : "Source created", message: updated.name });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Gagal simpan source extension.";
+      setMessage(errorMessage);
+      pushToast({ tone: "error", title: "Source save failed", message: errorMessage });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleSourceDelete(source: SourceSummary) {
+    if (!window.confirm(`Delete source ${source.name}? Imported series yang sudah link ke source ini tidak ikut dihapus.`)) return;
+    setBusy(true);
+    try {
+      await adminFetch(`/api/v1/admin/extensions/${source.id}`, savedToken, { method: "DELETE" });
+      const loaded = await loadSources(savedToken);
+      setSourceStatuses((current) => {
+        const next = { ...current };
+        delete next[source.id];
+        return next;
+      });
+      if (activeSourceId === source.id) setActiveSourceId(loaded.find(sourceEnabled)?.id || loaded[0]?.id || "");
+      if (sourceForm.editingID === source.id) setSourceForm(emptyExtensionForm());
+      setMessage(`${source.name} deleted.`);
+      pushToast({ tone: "success", title: "Source deleted", message: source.name });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Gagal delete source extension.";
+      setMessage(errorMessage);
+      pushToast({ tone: "error", title: "Source delete failed", message: errorMessage });
     } finally {
       setBusy(false);
     }
@@ -832,12 +914,89 @@ export default function AdminPage() {
                     <button type="button" onClick={() => void handleSourceToggle(source)} disabled={!savedToken || busy} className={`rounded-xl border px-3 py-2 text-xs font-black transition disabled:opacity-40 ${enabled ? "border-amber-200/35 text-amber-100 hover:bg-amber-200 hover:text-black" : "border-lime-200/35 text-lime-100 hover:bg-lime-200 hover:text-black"}`}>
                       {enabled ? "Disable" : "Enable"}
                     </button>
+                    {source.kind === "json-http" ? (
+                      <button type="button" onClick={() => setSourceForm(extensionFormFromSource(source))} disabled={!savedToken || busy} className="rounded-xl border border-sky-200/30 px-3 py-2 text-xs font-black text-sky-100 transition hover:bg-sky-200 hover:text-black disabled:opacity-40">
+                        Edit
+                      </button>
+                    ) : null}
+                    {source.kind === "json-http" ? (
+                      <button type="button" onClick={() => void handleSourceDelete(source)} disabled={!savedToken || busy} className="rounded-xl border border-red-200/35 px-3 py-2 text-xs font-black text-red-100 transition hover:bg-red-200 hover:text-black disabled:opacity-40">
+                        Delete
+                      </button>
+                    ) : null}
                   </div>
                 </article>
               );
             })}
             {sources.length === 0 ? <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-muted">Source belum loaded. Login dulu atau cek API/scraper stack.</p> : null}
           </div>
+          <form onSubmit={handleSourceExtensionSubmit} className="mt-4 rounded-3xl border border-sky-200/15 bg-sky-200/[0.05] p-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-sky-200">JSON HTTP extension</p>
+                <h3 className="mt-1 font-black">{sourceForm.editingID ? "Edit source" : "Add source"}</h3>
+                <p className="mt-1 text-xs text-muted">Tambah adapter kompatibel JSON HTTP tanpa restart API. Header rahasia jangan ditempel di chat/log.</p>
+              </div>
+              {sourceForm.editingID ? (
+                <button type="button" onClick={() => setSourceForm(emptyExtensionForm())} className="rounded-full border border-white/10 px-3 py-2 text-xs font-black text-muted transition hover:bg-white hover:text-black">
+                  Cancel edit
+                </button>
+              ) : null}
+            </div>
+            <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_1fr_2fr]">
+              <label className="text-xs font-bold text-muted">
+                Source ID
+                <input
+                  value={sourceForm.id}
+                  onChange={(event) => setSourceForm((current) => ({ ...current, id: event.target.value }))}
+                  disabled={!savedToken || busy || Boolean(sourceForm.editingID)}
+                  placeholder="my-source"
+                  className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-3 text-sm text-white outline-none transition focus:border-sky-200 disabled:opacity-50"
+                />
+              </label>
+              <label className="text-xs font-bold text-muted">
+                Name
+                <input
+                  value={sourceForm.name}
+                  onChange={(event) => setSourceForm((current) => ({ ...current, name: event.target.value }))}
+                  disabled={!savedToken || busy}
+                  placeholder="My Source"
+                  className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-3 text-sm text-white outline-none transition focus:border-sky-200 disabled:opacity-50"
+                />
+              </label>
+              <label className="text-xs font-bold text-muted">
+                Base URL
+                <input
+                  value={sourceForm.baseUrl}
+                  onChange={(event) => setSourceForm((current) => ({ ...current, baseUrl: event.target.value }))}
+                  disabled={!savedToken || busy}
+                  placeholder="http://localhost:19190"
+                  className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-3 text-sm text-white outline-none transition focus:border-sky-200 disabled:opacity-50"
+                />
+              </label>
+            </div>
+            <label className="mt-3 block text-xs font-bold text-muted">
+              Optional headers JSON
+              <textarea
+                value={sourceForm.headersJSON}
+                onChange={(event) => setSourceForm((current) => ({ ...current, headersJSON: event.target.value }))}
+                disabled={!savedToken || busy}
+                rows={3}
+                spellCheck={false}
+                placeholder='{"X-Api-Key":"[REDACTED]"}'
+                className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-3 font-mono text-xs text-white outline-none transition focus:border-sky-200 disabled:opacity-50"
+              />
+            </label>
+            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <label className="inline-flex items-center gap-2 text-sm font-bold text-zinc-200">
+                <input type="checkbox" checked={sourceForm.enabled} onChange={(event) => setSourceForm((current) => ({ ...current, enabled: event.target.checked }))} disabled={!savedToken || busy} className="h-4 w-4 accent-sky-200" />
+                Enabled after save
+              </label>
+              <button disabled={!savedToken || busy || !sourceForm.name || !sourceForm.baseUrl || (!sourceForm.editingID && !sourceForm.id)} className="rounded-2xl bg-sky-200 px-5 py-3 text-sm font-black text-black transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50">
+                {sourceForm.editingID ? "Update source" : "Add source"}
+              </button>
+            </div>
+          </form>
           <div className="mt-4">
             <p className="text-xs font-semibold text-muted">Quick query presets for {activeSourceName}</p>
             <div className="mt-2 flex flex-wrap gap-2">

@@ -169,6 +169,106 @@ func TestAdminExtensionsListAndPatch(t *testing.T) {
 	}
 }
 
+func TestAdminDynamicJSONHTTPExtensionLifecycle(t *testing.T) {
+	firstSource := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/healthz":
+			w.WriteHeader(http.StatusOK)
+		case "/search":
+			writeJSON(w, http.StatusOK, map[string]any{"results": []map[string]any{{"id": "first-id", "title": "First Dynamic"}}})
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer firstSource.Close()
+	secondSource := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/healthz":
+			w.WriteHeader(http.StatusOK)
+		case "/search":
+			writeJSON(w, http.StatusOK, map[string]any{"results": []map[string]any{{"id": "second-id", "title": "Second Dynamic"}}})
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer secondSource.Close()
+
+	handler := NewHandler(catalog.NewRepository(seed.Series()), WithAdminToken("dev-token")).Routes()
+
+	createBody := `{"id":"dynamic-http","name":"Dynamic HTTP","kind":"json-http","baseUrl":"` + firstSource.URL + `","enabled":true}`
+	createRecorder := httptest.NewRecorder()
+	createRequest := httptest.NewRequest(http.MethodPost, "/api/v1/admin/extensions", bytes.NewBufferString(createBody))
+	createRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(createRecorder, createRequest)
+	if createRecorder.Code != http.StatusCreated {
+		t.Fatalf("expected extension create 201, got %d body=%s", createRecorder.Code, createRecorder.Body.String())
+	}
+
+	statusRecorder := httptest.NewRecorder()
+	statusRequest := httptest.NewRequest(http.MethodGet, "/api/v1/admin/extensions/dynamic-http/status", nil)
+	statusRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(statusRecorder, statusRequest)
+	if statusRecorder.Code != http.StatusOK {
+		t.Fatalf("expected dynamic status 200, got %d body=%s", statusRecorder.Code, statusRecorder.Body.String())
+	}
+
+	searchRecorder := httptest.NewRecorder()
+	searchRequest := httptest.NewRequest(http.MethodGet, "/api/v1/admin/sources/dynamic-http/search?q=x", nil)
+	searchRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(searchRecorder, searchRequest)
+	if searchRecorder.Code != http.StatusOK || !bytes.Contains(searchRecorder.Body.Bytes(), []byte("first-id")) {
+		t.Fatalf("expected first source search 200, got %d body=%s", searchRecorder.Code, searchRecorder.Body.String())
+	}
+
+	patchRecorder := httptest.NewRecorder()
+	patchRequest := httptest.NewRequest(http.MethodPatch, "/api/v1/admin/extensions/dynamic-http", bytes.NewBufferString(`{"name":"Dynamic HTTP 2","baseUrl":"`+secondSource.URL+`"}`))
+	patchRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(patchRecorder, patchRequest)
+	if patchRecorder.Code != http.StatusOK {
+		t.Fatalf("expected extension patch 200, got %d body=%s", patchRecorder.Code, patchRecorder.Body.String())
+	}
+
+	secondSearchRecorder := httptest.NewRecorder()
+	secondSearchRequest := httptest.NewRequest(http.MethodGet, "/api/v1/admin/sources/dynamic-http/search?q=x", nil)
+	secondSearchRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(secondSearchRecorder, secondSearchRequest)
+	if secondSearchRecorder.Code != http.StatusOK || !bytes.Contains(secondSearchRecorder.Body.Bytes(), []byte("second-id")) {
+		t.Fatalf("expected re-registered source search 200, got %d body=%s", secondSearchRecorder.Code, secondSearchRecorder.Body.String())
+	}
+
+	disableRecorder := httptest.NewRecorder()
+	disableRequest := httptest.NewRequest(http.MethodPatch, "/api/v1/admin/extensions/dynamic-http", bytes.NewBufferString(`{"enabled":false}`))
+	disableRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(disableRecorder, disableRequest)
+	if disableRecorder.Code != http.StatusOK {
+		t.Fatalf("expected disable 200, got %d body=%s", disableRecorder.Code, disableRecorder.Body.String())
+	}
+
+	disabledSearchRecorder := httptest.NewRecorder()
+	disabledSearchRequest := httptest.NewRequest(http.MethodGet, "/api/v1/admin/sources/dynamic-http/search?q=x", nil)
+	disabledSearchRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(disabledSearchRecorder, disabledSearchRequest)
+	if disabledSearchRecorder.Code != http.StatusConflict {
+		t.Fatalf("expected disabled search 409, got %d body=%s", disabledSearchRecorder.Code, disabledSearchRecorder.Body.String())
+	}
+
+	deleteRecorder := httptest.NewRecorder()
+	deleteRequest := httptest.NewRequest(http.MethodDelete, "/api/v1/admin/extensions/dynamic-http", nil)
+	deleteRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(deleteRecorder, deleteRequest)
+	if deleteRecorder.Code != http.StatusOK {
+		t.Fatalf("expected delete 200, got %d body=%s", deleteRecorder.Code, deleteRecorder.Body.String())
+	}
+
+	deletedStatusRecorder := httptest.NewRecorder()
+	deletedStatusRequest := httptest.NewRequest(http.MethodGet, "/api/v1/admin/extensions/dynamic-http/status", nil)
+	deletedStatusRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(deletedStatusRecorder, deletedStatusRequest)
+	if deletedStatusRecorder.Code != http.StatusNotFound {
+		t.Fatalf("expected deleted status 404, got %d body=%s", deletedStatusRecorder.Code, deletedStatusRecorder.Body.String())
+	}
+}
+
 func TestAdminSyncSourceRejectsDisabledExtension(t *testing.T) {
 	repo := catalog.NewRepository(seed.Series())
 	_, err := repo.UpsertSourceExtension(context.Background(), types.SourceExtensionInput{

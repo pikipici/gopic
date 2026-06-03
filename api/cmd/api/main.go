@@ -95,10 +95,31 @@ func main() {
 	sourceRegistry := source.NewRegistry(registeredSources...)
 	if adminStore, ok := repo.(catalog.AdminStore); ok {
 		for _, input := range sourceExtensionInputs {
+			if existing, ok, err := adminStore.GetSourceExtension(ctx, input.ID); err != nil {
+				slog.Error("load source extension", "id", input.ID, "error", err)
+				os.Exit(1)
+			} else if ok {
+				input.Enabled = existing.Enabled
+			}
 			if _, err := adminStore.UpsertSourceExtension(ctx, input); err != nil {
 				slog.Error("sync source extension", "id", input.ID, "error", err)
 				os.Exit(1)
 			}
+		}
+		items, err := adminStore.ListSourceExtensions(ctx)
+		if err != nil {
+			slog.Error("list source extensions", "error", err)
+			os.Exit(1)
+		}
+		for _, item := range items {
+			if item.Kind != "json-http" {
+				continue
+			}
+			if _, ok := sourceRegistry.Get(item.ID); ok {
+				continue
+			}
+			sourceRegistry.Register(source.NewJSONHTTPSourceWithHeaders(item.ID, item.Name, item.BaseURL, extensionHeaders(item.Config)))
+			slog.Info("registered persisted json http source", "id", item.ID, "url", item.BaseURL)
 		}
 	}
 
@@ -115,4 +136,19 @@ func main() {
 		slog.Error("server stopped", "error", err)
 		os.Exit(1)
 	}
+}
+
+func extensionHeaders(config map[string]any) map[string]string {
+	raw, ok := config["headers"].(map[string]any)
+	if !ok {
+		return nil
+	}
+	headers := map[string]string{}
+	for key, value := range raw {
+		text, ok := value.(string)
+		if ok && key != "" && text != "" {
+			headers[key] = text
+		}
+	}
+	return headers
 }

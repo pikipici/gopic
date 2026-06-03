@@ -22,8 +22,10 @@ var (
 type AdminStore interface {
 	ListAdminSeries(ctx context.Context, query Query) ([]types.SeriesSummary, int, error)
 	ListSourceExtensions(ctx context.Context) ([]types.SourceExtension, error)
+	GetSourceExtension(ctx context.Context, id string) (types.SourceExtension, bool, error)
 	UpsertSourceExtension(ctx context.Context, input types.SourceExtensionInput) (types.SourceExtension, error)
 	UpdateSourceExtension(ctx context.Context, id string, patch types.SourceExtensionPatch) (types.SourceExtension, bool, error)
+	DeleteSourceExtension(ctx context.Context, id string) (bool, error)
 	UpsertSeries(ctx context.Context, input types.SeriesInput) (types.SeriesDetail, error)
 	UpsertChapter(ctx context.Context, seriesSlug string, input types.ChapterInput) (types.ChapterSummary, error)
 	ReplaceChapterPages(ctx context.Context, seriesSlug, chapterSlug string, pages []types.ChapterPage) (types.ChapterReader, error)
@@ -80,6 +82,14 @@ func (r *Repository) UpsertSourceExtension(ctx context.Context, input types.Sour
 	return item, nil
 }
 
+func (r *Repository) GetSourceExtension(ctx context.Context, id string) (types.SourceExtension, bool, error) {
+	if err := ctx.Err(); err != nil {
+		return types.SourceExtension{}, false, err
+	}
+	item, ok := r.extensions().items[id]
+	return item, ok, nil
+}
+
 func (r *Repository) UpdateSourceExtension(ctx context.Context, id string, patch types.SourceExtensionPatch) (types.SourceExtension, bool, error) {
 	if err := ctx.Err(); err != nil {
 		return types.SourceExtension{}, false, err
@@ -88,15 +98,44 @@ func (r *Repository) UpdateSourceExtension(ctx context.Context, id string, patch
 	if !ok {
 		return types.SourceExtension{}, false, nil
 	}
+	if patch.Name != nil {
+		item.Name = strings.TrimSpace(*patch.Name)
+	}
+	if patch.Kind != nil {
+		item.Kind = strings.TrimSpace(*patch.Kind)
+	}
+	if patch.BaseURL != nil {
+		item.BaseURL = strings.TrimSpace(*patch.BaseURL)
+	}
 	if patch.Enabled != nil {
 		item.Enabled = *patch.Enabled
+	}
+	if patch.Capabilities != nil {
+		item.Capabilities = *patch.Capabilities
 	}
 	if patch.Config != nil {
 		item.Config = patch.Config
 	}
+	if item.ID == "" || item.Name == "" {
+		return types.SourceExtension{}, false, ErrInvalidSourceExtensionInput
+	}
+	if item.Kind == "" {
+		item.Kind = "json-http"
+	}
 	item.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
 	r.extensions().items[id] = item
 	return item, true, nil
+}
+
+func (r *Repository) DeleteSourceExtension(ctx context.Context, id string) (bool, error) {
+	if err := ctx.Err(); err != nil {
+		return false, err
+	}
+	if _, ok := r.extensions().items[id]; !ok {
+		return false, nil
+	}
+	delete(r.extensions().items, id)
+	return true, nil
 }
 
 func (r *Repository) UpsertSeries(ctx context.Context, input types.SeriesInput) (types.SeriesDetail, error) {

@@ -144,8 +144,12 @@ type SourceExtensionInput struct {
 }
 
 type SourceExtensionPatch struct {
-	Enabled *bool          `json:"enabled"`
-	Config  map[string]any `json:"config"`
+	Name         *string        `json:"name"`
+	Kind         *string        `json:"kind"`
+	BaseURL      *string        `json:"baseUrl"`
+	Enabled      *bool          `json:"enabled"`
+	Capabilities *[]string      `json:"capabilities"`
+	Config       map[string]any `json:"config"`
 }
 
 type SeriesInput struct {

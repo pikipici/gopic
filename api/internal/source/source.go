@@ -3,6 +3,7 @@ package source
 import (
 	"context"
 	"strings"
+	"sync"
 
 	"gomic-api/internal/types"
 )
@@ -56,6 +57,7 @@ type HealthCheck interface {
 }
 
 type Registry struct {
+	mu      sync.RWMutex
 	sources map[string]Source
 }
 
@@ -80,6 +82,8 @@ func NewRegistry(sources ...Source) *Registry {
 }
 
 func (r *Registry) List() []Summary {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 	items := make([]Summary, 0, len(r.sources))
 	for _, item := range r.sources {
 		items = append(items, Summary{ID: item.ID(), Name: item.Name()})
@@ -88,12 +92,31 @@ func (r *Registry) List() []Summary {
 }
 
 func (r *Registry) Get(id string) (Source, bool) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 	item, ok := r.sources[id]
 	return item, ok
 }
 
+func (r *Registry) Register(item Source) {
+	if item == nil || strings.TrimSpace(item.ID()) == "" {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.sources[item.ID()] = item
+}
+
+func (r *Registry) Unregister(id string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	delete(r.sources, id)
+}
+
 func (r *Registry) Status(ctx context.Context, id string) (Status, bool) {
+	r.mu.RLock()
 	item, ok := r.sources[id]
+	r.mu.RUnlock()
 	if !ok {
 		return Status{}, false
 	}

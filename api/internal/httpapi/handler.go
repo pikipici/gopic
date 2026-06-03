@@ -9,9 +9,11 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -109,8 +111,10 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("GET /api/v1/admin/series", h.requireAdmin(h.adminSeriesList))
 	mux.HandleFunc("POST /api/v1/admin/series", h.requireAdmin(h.adminSeriesUpsert))
 	mux.HandleFunc("GET /api/v1/admin/extensions", h.requireAdmin(h.adminExtensionsList))
+	mux.HandleFunc("POST /api/v1/admin/extensions", h.requireAdmin(h.adminExtensionCreate))
 	mux.HandleFunc("GET /api/v1/admin/extensions/{sourceID}/status", h.requireAdmin(h.adminExtensionStatus))
 	mux.HandleFunc("PATCH /api/v1/admin/extensions/{sourceID}", h.requireAdmin(h.adminExtensionPatch))
+	mux.HandleFunc("DELETE /api/v1/admin/extensions/{sourceID}", h.requireAdmin(h.adminExtensionDelete))
 	mux.HandleFunc("GET /api/v1/admin/sources", h.requireAdmin(h.adminSourcesList))
 	mux.HandleFunc("GET /api/v1/admin/sources/{sourceID}/search", h.requireAdmin(h.adminSourceSearch))
 	mux.HandleFunc("GET /api/v1/admin/sources/{sourceID}/series/{seriesID}", h.requireAdmin(h.adminSourceDetail))
@@ -253,6 +257,30 @@ func (h *Handler) adminExtensionsList(w http.ResponseWriter, r *http.Request) {
 	writeEnvelope(w, http.StatusOK, items, map[string]any{"total": len(items)})
 }
 
+func (h *Handler) adminExtensionCreate(w http.ResponseWriter, r *http.Request) {
+	if h.adminRepo == nil {
+		writeError(w, http.StatusServiceUnavailable, "admin_unavailable", "admin repository is not available")
+		return
+	}
+	var input types.SourceExtensionInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		writeError(w, http.StatusBadRequest, "bad_request", "invalid json body")
+		return
+	}
+	input = normalizeExtensionInput(input)
+	if err := validateExtensionInput(input); err != nil {
+		writeError(w, http.StatusBadRequest, "bad_request", err.Error())
+		return
+	}
+	item, err := h.adminRepo.UpsertSourceExtension(r.Context(), input)
+	if err != nil {
+		writeRepoError(w, err)
+		return
+	}
+	h.registerRuntimeExtension(item)
+	writeEnvelope(w, http.StatusCreated, item, map[string]any{})
+}
+
 func (h *Handler) adminExtensionPatch(w http.ResponseWriter, r *http.Request) {
 	if h.adminRepo == nil {
 		writeError(w, http.StatusServiceUnavailable, "admin_unavailable", "admin repository is not available")
@@ -261,6 +289,16 @@ func (h *Handler) adminExtensionPatch(w http.ResponseWriter, r *http.Request) {
 	var patch types.SourceExtensionPatch
 	if err := json.NewDecoder(r.Body).Decode(&patch); err != nil {
 		writeError(w, http.StatusBadRequest, "bad_request", "invalid json body")
+		return
+	}
+	if current, ok, err := h.adminRepo.GetSourceExtension(r.Context(), r.PathValue("sourceID")); err != nil {
+		writeRepoError(w, err)
+		return
+	} else if !ok {
+		writeError(w, http.StatusNotFound, "not_found", "extension not found")
+		return
+	} else if err := validateExtensionPatch(current, patch); err != nil {
+		writeError(w, http.StatusBadRequest, "bad_request", err.Error())
 		return
 	}
 	item, ok, err := h.adminRepo.UpdateSourceExtension(r.Context(), r.PathValue("sourceID"), patch)
@@ -272,7 +310,122 @@ func (h *Handler) adminExtensionPatch(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusNotFound, "not_found", "extension not found")
 		return
 	}
+	h.registerRuntimeExtension(item)
 	writeEnvelope(w, http.StatusOK, item, map[string]any{})
+}
+
+func (h *Handler) adminExtensionDelete(w http.ResponseWriter, r *http.Request) {
+	if h.adminRepo == nil {
+		writeError(w, http.StatusServiceUnavailable, "admin_unavailable", "admin repository is not available")
+		return
+	}
+	deleted, err := h.adminRepo.DeleteSourceExtension(r.Context(), r.PathValue("sourceID"))
+	if err != nil {
+		writeRepoError(w, err)
+		return
+	}
+	if !deleted {
+		writeError(w, http.StatusNotFound, "not_found", "extension not found")
+		return
+	}
+	h.sources.Unregister(r.PathValue("sourceID"))
+	writeEnvelope(w, http.StatusOK, map[string]any{"deleted": true}, map[string]any{})
+}
+
+var sourceExtensionIDPattern = regexp.MustCompile(`^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$`)
+
+func normalizeExtensionInput(input types.SourceExtensionInput) types.SourceExtensionInput {
+	input.ID = strings.TrimSpace(input.ID)
+	input.Name = strings.TrimSpace(input.Name)
+	input.Kind = strings.TrimSpace(input.Kind)
+	input.BaseURL = strings.TrimRight(strings.TrimSpace(input.BaseURL), "/")
+	if input.Kind == "" {
+		input.Kind = "json-http"
+	}
+	if input.Config == nil {
+		input.Config = map[string]any{}
+	}
+	if len(input.Capabilities) == 0 && input.Kind == "json-http" {
+		input.Capabilities = []string{"search", "detail", "import", "pages", "health"}
+	}
+	return input
+}
+
+func validateExtensionPatch(current types.SourceExtension, patch types.SourceExtensionPatch) error {
+	if current.Kind != "json-http" {
+		if patch.Name != nil || patch.Kind != nil || patch.BaseURL != nil || patch.Capabilities != nil {
+			return fmt.Errorf("only json-http extensions can edit source configuration")
+		}
+		return nil
+	}
+	input := types.SourceExtensionInput{
+		ID:           current.ID,
+		Name:         current.Name,
+		Kind:         current.Kind,
+		BaseURL:      current.BaseURL,
+		Enabled:      current.Enabled,
+		Capabilities: current.Capabilities,
+		Config:       current.Config,
+	}
+	if patch.Name != nil {
+		input.Name = *patch.Name
+	}
+	if patch.Kind != nil {
+		input.Kind = *patch.Kind
+	}
+	if patch.BaseURL != nil {
+		input.BaseURL = *patch.BaseURL
+	}
+	if patch.Enabled != nil {
+		input.Enabled = *patch.Enabled
+	}
+	if patch.Capabilities != nil {
+		input.Capabilities = *patch.Capabilities
+	}
+	if patch.Config != nil {
+		input.Config = patch.Config
+	}
+	return validateExtensionInput(normalizeExtensionInput(input))
+}
+
+func validateExtensionInput(input types.SourceExtensionInput) error {
+	if !sourceExtensionIDPattern.MatchString(input.ID) {
+		return fmt.Errorf("extension id must be lowercase letters, numbers, and dashes")
+	}
+	if input.Name == "" {
+		return fmt.Errorf("extension name is required")
+	}
+	if input.Kind != "json-http" {
+		return fmt.Errorf("extension kind must be json-http")
+	}
+	parsed, err := url.Parse(input.BaseURL)
+	if err != nil || parsed.Host == "" || (parsed.Scheme != "http" && parsed.Scheme != "https") {
+		return fmt.Errorf("json-http extension baseUrl must be an http or https URL")
+	}
+	return nil
+}
+
+func (h *Handler) registerRuntimeExtension(item types.SourceExtension) {
+	if item.Kind != "json-http" {
+		return
+	}
+	h.sources.Register(source.NewJSONHTTPSourceWithHeaders(item.ID, item.Name, item.BaseURL, extensionHeaders(item.Config)))
+}
+
+func extensionHeaders(config map[string]any) map[string]string {
+	raw, ok := config["headers"].(map[string]any)
+	if !ok {
+		return nil
+	}
+	headers := map[string]string{}
+	for key, value := range raw {
+		text, ok := value.(string)
+		key = strings.TrimSpace(key)
+		if ok && key != "" && text != "" {
+			headers[key] = text
+		}
+	}
+	return headers
 }
 
 func (h *Handler) adminExtensionStatus(w http.ResponseWriter, r *http.Request) {
