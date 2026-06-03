@@ -45,3 +45,4 @@ Thumbs.db
 # Local-only agent/project state
 LOCAL_AI_CONTEXT.md
 web/.git.backup/
+.commandcode/
