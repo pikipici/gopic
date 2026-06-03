@@ -17,6 +17,7 @@ import (
 	"gomic-api/internal/jobs"
 	"gomic-api/internal/seed"
 	"gomic-api/internal/source"
+	"gomic-api/internal/types"
 )
 
 func sourceIndex(idx int) string {
@@ -55,6 +56,14 @@ func main() {
 	}
 
 	registeredSources := []source.Source{source.NewMockSource()}
+	sourceExtensionInputs := []types.SourceExtensionInput{{
+		ID:           "mock-mihon",
+		Name:         "Mock Mihon Source",
+		Kind:         "mock",
+		Enabled:      true,
+		Capabilities: []string{"search", "detail", "import", "pages"},
+		Config:       map[string]any{},
+	}}
 	for idx, sourceConfig := range cfg.Sources {
 		sourceID := sourceConfig.ID
 		if sourceID == "" {
@@ -72,9 +81,26 @@ func main() {
 			headers = cfg.SourceHeaders
 		}
 		registeredSources = append(registeredSources, source.NewJSONHTTPSourceWithHeaders(sourceID, sourceName, sourceConfig.URL, headers))
+		sourceExtensionInputs = append(sourceExtensionInputs, types.SourceExtensionInput{
+			ID:           sourceID,
+			Name:         sourceName,
+			Kind:         "json-http",
+			BaseURL:      sourceConfig.URL,
+			Enabled:      true,
+			Capabilities: []string{"search", "detail", "import", "pages"},
+			Config:       map[string]any{},
+		})
 		slog.Info("registered json http source", "id", sourceID, "url", sourceConfig.URL)
 	}
 	sourceRegistry := source.NewRegistry(registeredSources...)
+	if adminStore, ok := repo.(catalog.AdminStore); ok {
+		for _, input := range sourceExtensionInputs {
+			if _, err := adminStore.UpsertSourceExtension(ctx, input); err != nil {
+				slog.Error("sync source extension", "id", input.ID, "error", err)
+				os.Exit(1)
+			}
+		}
+	}
 
 	handler := httpapi.NewHandler(repo, httpapi.WithAdminToken(cfg.AdminToken), httpapi.WithUploadDir(cfg.UploadDir), httpapi.WithJobStore(jobStore), httpapi.WithSourceRegistry(sourceRegistry), httpapi.WithImageHeaders(cfg.ImageHeaders))
 

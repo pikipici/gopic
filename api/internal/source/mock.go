@@ -18,6 +18,8 @@ func (MockSource) ID() string { return "mock-mihon" }
 
 func (MockSource) Name() string { return "Mock Mihon Source" }
 
+func (MockSource) Health(ctx context.Context) error { return ctx.Err() }
+
 func (s MockSource) Search(ctx context.Context, query string) ([]SeriesResult, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err

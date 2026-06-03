@@ -99,8 +99,22 @@ CREATE TABLE IF NOT EXISTS admin_jobs (
   completed_at TIMESTAMPTZ
 );
 
+CREATE TABLE IF NOT EXISTS admin_source_extensions (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  kind TEXT NOT NULL DEFAULT 'json-http',
+  base_url TEXT NOT NULL DEFAULT '',
+  enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  capabilities TEXT[] NOT NULL DEFAULT '{}',
+  config JSONB NOT NULL DEFAULT '{}'::jsonb,
+  last_error TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE UNIQUE INDEX IF NOT EXISTS idx_series_source_unique ON series (source_id, source_series_id) WHERE source_id <> '' AND source_series_id <> '';
 CREATE INDEX IF NOT EXISTS idx_admin_jobs_updated ON admin_jobs (updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_admin_source_extensions_enabled ON admin_source_extensions (enabled, updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_series_public ON series (publish_state, updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_series_slug_public ON series (slug) WHERE publish_state = 'published';
 CREATE INDEX IF NOT EXISTS idx_chapters_public ON chapters (series_id, publish_state, number_sort DESC);

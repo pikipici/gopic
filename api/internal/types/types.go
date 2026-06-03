@@ -120,6 +120,34 @@ type AdminLoginResponse struct {
 	Token string `json:"token"`
 }
 
+type SourceExtension struct {
+	ID           string         `json:"id"`
+	Name         string         `json:"name"`
+	Kind         string         `json:"kind"`
+	BaseURL      string         `json:"baseUrl"`
+	Enabled      bool           `json:"enabled"`
+	Capabilities []string       `json:"capabilities"`
+	Config       map[string]any `json:"config"`
+	LastError    string         `json:"lastError"`
+	UpdatedAt    string         `json:"updatedAt"`
+}
+
+type SourceExtensionInput struct {
+	ID           string         `json:"id"`
+	Name         string         `json:"name"`
+	Kind         string         `json:"kind"`
+	BaseURL      string         `json:"baseUrl"`
+	Enabled      bool           `json:"enabled"`
+	Capabilities []string       `json:"capabilities"`
+	Config       map[string]any `json:"config"`
+	LastError    string         `json:"lastError"`
+}
+
+type SourceExtensionPatch struct {
+	Enabled *bool          `json:"enabled"`
+	Config  map[string]any `json:"config"`
+}
+
 type SeriesInput struct {
 	Slug           string        `json:"slug"`
 	Title          string        `json:"title"`

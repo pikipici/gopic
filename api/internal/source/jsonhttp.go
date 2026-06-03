@@ -99,6 +99,29 @@ func (s *JSONHTTPSource) Pages(ctx context.Context, seriesID, chapterSlug string
 	return response.Pages, nil
 }
 
+func (s *JSONHTTPSource) Health(ctx context.Context) error {
+	if s.baseURL == "" {
+		return fmt.Errorf("json http source base url is not configured")
+	}
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, s.baseURL+"/healthz", nil)
+	if err != nil {
+		return err
+	}
+	request.Header.Set("Accept", "application/json")
+	for key, value := range s.headers {
+		request.Header.Set(key, value)
+	}
+	response, err := s.client.Do(request)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+	if response.StatusCode < 200 || response.StatusCode >= 300 {
+		return fmt.Errorf("json http source health: status %d", response.StatusCode)
+	}
+	return nil
+}
+
 func (s *JSONHTTPSource) get(ctx context.Context, path string, target any) error {
 	if s.baseURL == "" {
 		return fmt.Errorf("json http source base url is not configured")

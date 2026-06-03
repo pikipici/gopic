@@ -11,22 +11,92 @@ import (
 )
 
 var (
-	ErrInvalidSeriesInput  = errors.New("invalid series input")
-	ErrInvalidChapterInput = errors.New("invalid chapter input")
-	ErrInvalidPagesInput   = errors.New("invalid pages input")
-	ErrSeriesNotFound      = errors.New("series not found")
-	ErrChapterNotFound     = errors.New("chapter not found")
+	ErrInvalidSeriesInput          = errors.New("invalid series input")
+	ErrInvalidChapterInput         = errors.New("invalid chapter input")
+	ErrInvalidPagesInput           = errors.New("invalid pages input")
+	ErrInvalidSourceExtensionInput = errors.New("invalid source extension input")
+	ErrSeriesNotFound              = errors.New("series not found")
+	ErrChapterNotFound             = errors.New("chapter not found")
 )
 
 type AdminStore interface {
 	ListAdminSeries(ctx context.Context, query Query) ([]types.SeriesSummary, int, error)
+	ListSourceExtensions(ctx context.Context) ([]types.SourceExtension, error)
+	UpsertSourceExtension(ctx context.Context, input types.SourceExtensionInput) (types.SourceExtension, error)
+	UpdateSourceExtension(ctx context.Context, id string, patch types.SourceExtensionPatch) (types.SourceExtension, bool, error)
 	UpsertSeries(ctx context.Context, input types.SeriesInput) (types.SeriesDetail, error)
 	UpsertChapter(ctx context.Context, seriesSlug string, input types.ChapterInput) (types.ChapterSummary, error)
 	ReplaceChapterPages(ctx context.Context, seriesSlug, chapterSlug string, pages []types.ChapterPage) (types.ChapterReader, error)
 }
 
+type sourceExtensionStore struct {
+	items map[string]types.SourceExtension
+}
+
 func (r *Repository) ListAdminSeries(ctx context.Context, query Query) ([]types.SeriesSummary, int, error) {
 	return r.List(ctx, query)
+}
+
+func (r *Repository) ListSourceExtensions(ctx context.Context) ([]types.SourceExtension, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	items := make([]types.SourceExtension, 0, len(r.extensions().items))
+	for _, item := range r.extensions().items {
+		items = append(items, item)
+	}
+	sort.SliceStable(items, func(i, j int) bool { return items[i].Name < items[j].Name })
+	return items, nil
+}
+
+func (r *Repository) UpsertSourceExtension(ctx context.Context, input types.SourceExtensionInput) (types.SourceExtension, error) {
+	if err := ctx.Err(); err != nil {
+		return types.SourceExtension{}, err
+	}
+	input.ID = strings.TrimSpace(input.ID)
+	input.Name = strings.TrimSpace(input.Name)
+	if input.ID == "" || input.Name == "" {
+		return types.SourceExtension{}, ErrInvalidSourceExtensionInput
+	}
+	if input.Kind == "" {
+		input.Kind = "json-http"
+	}
+	now := time.Now().UTC().Format(time.RFC3339)
+	item := types.SourceExtension{
+		ID:           input.ID,
+		Name:         input.Name,
+		Kind:         input.Kind,
+		BaseURL:      input.BaseURL,
+		Enabled:      input.Enabled,
+		Capabilities: input.Capabilities,
+		Config:       input.Config,
+		LastError:    input.LastError,
+		UpdatedAt:    now,
+	}
+	if item.Config == nil {
+		item.Config = map[string]any{}
+	}
+	r.extensions().items[item.ID] = item
+	return item, nil
+}
+
+func (r *Repository) UpdateSourceExtension(ctx context.Context, id string, patch types.SourceExtensionPatch) (types.SourceExtension, bool, error) {
+	if err := ctx.Err(); err != nil {
+		return types.SourceExtension{}, false, err
+	}
+	item, ok := r.extensions().items[id]
+	if !ok {
+		return types.SourceExtension{}, false, nil
+	}
+	if patch.Enabled != nil {
+		item.Enabled = *patch.Enabled
+	}
+	if patch.Config != nil {
+		item.Config = patch.Config
+	}
+	item.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+	r.extensions().items[id] = item
+	return item, true, nil
 }
 
 func (r *Repository) UpsertSeries(ctx context.Context, input types.SeriesInput) (types.SeriesDetail, error) {

@@ -108,6 +108,9 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("POST /api/v1/admin/jobs/{jobID}/retry", h.requireAdmin(h.adminJobRetry))
 	mux.HandleFunc("GET /api/v1/admin/series", h.requireAdmin(h.adminSeriesList))
 	mux.HandleFunc("POST /api/v1/admin/series", h.requireAdmin(h.adminSeriesUpsert))
+	mux.HandleFunc("GET /api/v1/admin/extensions", h.requireAdmin(h.adminExtensionsList))
+	mux.HandleFunc("GET /api/v1/admin/extensions/{sourceID}/status", h.requireAdmin(h.adminExtensionStatus))
+	mux.HandleFunc("PATCH /api/v1/admin/extensions/{sourceID}", h.requireAdmin(h.adminExtensionPatch))
 	mux.HandleFunc("GET /api/v1/admin/sources", h.requireAdmin(h.adminSourcesList))
 	mux.HandleFunc("GET /api/v1/admin/sources/{sourceID}/search", h.requireAdmin(h.adminSourceSearch))
 	mux.HandleFunc("GET /api/v1/admin/sources/{sourceID}/series/{seriesID}", h.requireAdmin(h.adminSourceDetail))
@@ -225,10 +228,90 @@ func (h *Handler) adminSeriesUpsert(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) adminSourcesList(w http.ResponseWriter, r *http.Request) {
+	if h.adminRepo != nil {
+		items, err := h.adminRepo.ListSourceExtensions(r.Context())
+		if err != nil {
+			writeRepoError(w, err)
+			return
+		}
+		writeEnvelope(w, http.StatusOK, items, map[string]any{"total": len(items)})
+		return
+	}
 	writeEnvelope(w, http.StatusOK, h.sources.List(), map[string]any{})
 }
 
+func (h *Handler) adminExtensionsList(w http.ResponseWriter, r *http.Request) {
+	if h.adminRepo == nil {
+		writeEnvelope(w, http.StatusOK, h.sources.List(), map[string]any{"total": len(h.sources.List())})
+		return
+	}
+	items, err := h.adminRepo.ListSourceExtensions(r.Context())
+	if err != nil {
+		writeRepoError(w, err)
+		return
+	}
+	writeEnvelope(w, http.StatusOK, items, map[string]any{"total": len(items)})
+}
+
+func (h *Handler) adminExtensionPatch(w http.ResponseWriter, r *http.Request) {
+	if h.adminRepo == nil {
+		writeError(w, http.StatusServiceUnavailable, "admin_unavailable", "admin repository is not available")
+		return
+	}
+	var patch types.SourceExtensionPatch
+	if err := json.NewDecoder(r.Body).Decode(&patch); err != nil {
+		writeError(w, http.StatusBadRequest, "bad_request", "invalid json body")
+		return
+	}
+	item, ok, err := h.adminRepo.UpdateSourceExtension(r.Context(), r.PathValue("sourceID"), patch)
+	if err != nil {
+		writeRepoError(w, err)
+		return
+	}
+	if !ok {
+		writeError(w, http.StatusNotFound, "not_found", "extension not found")
+		return
+	}
+	writeEnvelope(w, http.StatusOK, item, map[string]any{})
+}
+
+func (h *Handler) adminExtensionStatus(w http.ResponseWriter, r *http.Request) {
+	status, ok := h.sources.Status(r.Context(), r.PathValue("sourceID"))
+	if !ok {
+		writeError(w, http.StatusNotFound, "not_found", "extension not found")
+		return
+	}
+	statusMap := map[string]any{
+		"id":      status.ID,
+		"name":    status.Name,
+		"healthy": status.Healthy,
+		"message": status.Message,
+		"enabled": h.isSourceEnabled(r.Context(), status.ID),
+	}
+	writeEnvelope(w, http.StatusOK, statusMap, map[string]any{})
+}
+
+func (h *Handler) isSourceEnabled(ctx context.Context, sourceID string) bool {
+	if h.adminRepo == nil {
+		return true
+	}
+	items, err := h.adminRepo.ListSourceExtensions(ctx)
+	if err != nil {
+		return true
+	}
+	for _, item := range items {
+		if item.ID == sourceID {
+			return item.Enabled
+		}
+	}
+	return true
+}
+
 func (h *Handler) adminSourceSearch(w http.ResponseWriter, r *http.Request) {
+	if !h.isSourceEnabled(r.Context(), r.PathValue("sourceID")) {
+		writeError(w, http.StatusConflict, "source_disabled", "source extension is disabled")
+		return
+	}
 	item, ok := h.sources.Get(r.PathValue("sourceID"))
 	if !ok {
 		writeError(w, http.StatusNotFound, "not_found", "source not found")
@@ -243,6 +326,10 @@ func (h *Handler) adminSourceSearch(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) adminSourceDetail(w http.ResponseWriter, r *http.Request) {
+	if !h.isSourceEnabled(r.Context(), r.PathValue("sourceID")) {
+		writeError(w, http.StatusConflict, "source_disabled", "source extension is disabled")
+		return
+	}
 	item, ok := h.sources.Get(r.PathValue("sourceID"))
 	if !ok {
 		writeError(w, http.StatusNotFound, "not_found", "source not found")
@@ -307,6 +394,10 @@ func (h *Handler) adminJobRetry(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusNotFound, "not_found", "source not found")
 		return
 	}
+	if !h.isSourceEnabled(r.Context(), sourceID) {
+		writeError(w, http.StatusConflict, "source_disabled", "source extension is disabled")
+		return
+	}
 	options := sourceimport.DefaultImportOptions()
 	options.ChapterLimit = payloadInt(job.Payload, "chapterLimit")
 	if payloadBool(job.Payload, "metadataOnly") {
@@ -336,39 +427,22 @@ func (h *Handler) adminSourceImport(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusNotFound, "not_found", "source not found")
 		return
 	}
-	var input struct {
-		ID           string `json:"id"`
-		ChapterLimit int    `json:"chapterLimit"`
-		MetadataOnly bool   `json:"metadataOnly"`
-		CachePages   *bool  `json:"cachePages"`
+	if !h.isSourceEnabled(r.Context(), r.PathValue("sourceID")) {
+		writeError(w, http.StatusConflict, "source_disabled", "source extension is disabled")
+		return
 	}
+	var input sourceImportInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		writeError(w, http.StatusBadRequest, "bad_request", "invalid json body")
 		return
 	}
-	if input.ChapterLimit < 0 {
+	options, err := importOptionsFromInput(input)
+	if err != nil {
 		writeError(w, http.StatusBadRequest, "bad_request", "chapterLimit must be zero or greater")
 		return
 	}
-	options := sourceimport.DefaultImportOptions()
-	options.ChapterLimit = input.ChapterLimit
-	if input.MetadataOnly {
-		options.FetchPages = false
-		options.CachePages = false
-	}
-	if input.CachePages != nil {
-		options.CachePages = *input.CachePages
-	}
 	payload := map[string]any{"sourceId": r.PathValue("sourceID"), "sourceSeriesId": input.ID}
-	if options.ChapterLimit > 0 {
-		payload["chapterLimit"] = options.ChapterLimit
-	}
-	if input.MetadataOnly {
-		payload["metadataOnly"] = true
-	}
-	if input.CachePages != nil {
-		payload["cachePages"] = options.CachePages
-	}
+	addImportOptionPayload(payload, input, options)
 	job, err := h.jobs.Create(r.Context(), "source_import", "Queued source import", payload)
 	if err != nil {
 		writeRepoError(w, err)
@@ -385,15 +459,77 @@ func (h *Handler) adminSeriesSyncSource(w http.ResponseWriter, r *http.Request) 
 		writeError(w, http.StatusServiceUnavailable, "admin_unavailable", "admin repository is not available")
 		return
 	}
-	job, err := h.jobs.Create(r.Context(), "source_sync", "Queued source sync", map[string]any{"slug": r.PathValue("slug")})
+	detail, ok, err := h.repo.Detail(r.Context(), r.PathValue("slug"))
+	if err != nil {
+		writeRepoError(w, err)
+		return
+	}
+	if !ok {
+		writeError(w, http.StatusNotFound, "not_found", "series not found")
+		return
+	}
+	if detail.SourceID != "" && !h.isSourceEnabled(r.Context(), detail.SourceID) {
+		writeError(w, http.StatusConflict, "source_disabled", "source extension is disabled")
+		return
+	}
+	var input sourceImportInput
+	if r.Body != nil && r.ContentLength != 0 {
+		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+			writeError(w, http.StatusBadRequest, "bad_request", "invalid json body")
+			return
+		}
+	}
+	options, err := importOptionsFromInput(input)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "bad_request", "chapterLimit must be zero or greater")
+		return
+	}
+	payload := map[string]any{"slug": r.PathValue("slug")}
+	addImportOptionPayload(payload, input, options)
+	job, err := h.jobs.Create(r.Context(), "source_sync", "Queued source sync", payload)
 	if err != nil {
 		writeRepoError(w, err)
 		return
 	}
 	go h.runSourceJob(job.ID, func(ctx context.Context, report sourceimport.ProgressFunc) (sourceimport.Result, error) {
-		return h.sourceImporter().SyncSeriesWithProgress(ctx, r.PathValue("slug"), report)
+		return h.sourceImporter().SyncSeriesWithOptions(ctx, r.PathValue("slug"), options, report)
 	})
 	writeEnvelope(w, http.StatusAccepted, job, map[string]any{})
+}
+
+type sourceImportInput struct {
+	ID           string `json:"id"`
+	ChapterLimit int    `json:"chapterLimit"`
+	MetadataOnly bool   `json:"metadataOnly"`
+	CachePages   *bool  `json:"cachePages"`
+}
+
+func importOptionsFromInput(input sourceImportInput) (sourceimport.ImportOptions, error) {
+	if input.ChapterLimit < 0 {
+		return sourceimport.ImportOptions{}, fmt.Errorf("chapterLimit must be zero or greater")
+	}
+	options := sourceimport.DefaultImportOptions()
+	options.ChapterLimit = input.ChapterLimit
+	if input.CachePages != nil {
+		options.CachePages = *input.CachePages
+	}
+	if input.MetadataOnly {
+		options.FetchPages = false
+		options.CachePages = false
+	}
+	return options, nil
+}
+
+func addImportOptionPayload(payload map[string]any, input sourceImportInput, options sourceimport.ImportOptions) {
+	if options.ChapterLimit > 0 {
+		payload["chapterLimit"] = options.ChapterLimit
+	}
+	if input.MetadataOnly {
+		payload["metadataOnly"] = true
+	}
+	if input.CachePages != nil || input.MetadataOnly {
+		payload["cachePages"] = options.CachePages
+	}
 }
 
 func (h *Handler) sourceImporter() *sourceimport.Service {

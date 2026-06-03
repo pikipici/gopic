@@ -3,6 +3,7 @@ package catalog
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -16,8 +17,34 @@ type PostgresRepository struct {
 	pool *pgxpool.Pool
 }
 
+type sourceExtensionScanner func(dest ...any) error
+
 func NewPostgresRepository(pool *pgxpool.Pool) *PostgresRepository {
 	return &PostgresRepository{pool: pool}
+}
+
+func querySourceExtension(ctx context.Context, row pgx.Row) (types.SourceExtension, error) {
+	if err := ctx.Err(); err != nil {
+		return types.SourceExtension{}, err
+	}
+	return scanSourceExtension(row.Scan)
+}
+
+func scanSourceExtension(scan sourceExtensionScanner) (types.SourceExtension, error) {
+	var item types.SourceExtension
+	var configBytes []byte
+	if err := scan(&item.ID, &item.Name, &item.Kind, &item.BaseURL, &item.Enabled, &item.Capabilities, &configBytes, &item.LastError, &item.UpdatedAt); err != nil {
+		return types.SourceExtension{}, err
+	}
+	if len(configBytes) > 0 {
+		if err := json.Unmarshal(configBytes, &item.Config); err != nil {
+			return types.SourceExtension{}, err
+		}
+	}
+	if item.Config == nil {
+		item.Config = map[string]any{}
+	}
+	return item, nil
 }
 
 func (r *PostgresRepository) List(ctx context.Context, query Query) ([]types.SeriesSummary, int, error) {
@@ -231,6 +258,82 @@ ORDER BY g.name ASC`)
 
 func (r *PostgresRepository) ListAdminSeries(ctx context.Context, query Query) ([]types.SeriesSummary, int, error) {
 	return r.List(ctx, query)
+}
+
+func (r *PostgresRepository) ListSourceExtensions(ctx context.Context) ([]types.SourceExtension, error) {
+	rows, err := r.pool.Query(ctx, `
+SELECT id, name, kind, base_url, enabled, capabilities, config, last_error, updated_at::text
+FROM admin_source_extensions
+ORDER BY name ASC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	items := []types.SourceExtension{}
+	for rows.Next() {
+		item, err := scanSourceExtension(rows.Scan)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	return items, rows.Err()
+}
+
+func (r *PostgresRepository) UpsertSourceExtension(ctx context.Context, input types.SourceExtensionInput) (types.SourceExtension, error) {
+	input.ID = strings.TrimSpace(input.ID)
+	input.Name = strings.TrimSpace(input.Name)
+	if input.ID == "" || input.Name == "" {
+		return types.SourceExtension{}, ErrInvalidSourceExtensionInput
+	}
+	if input.Kind == "" {
+		input.Kind = "json-http"
+	}
+	configBytes, err := json.Marshal(input.Config)
+	if err != nil {
+		return types.SourceExtension{}, err
+	}
+	return querySourceExtension(ctx, r.pool.QueryRow(ctx, `
+INSERT INTO admin_source_extensions (id, name, kind, base_url, enabled, capabilities, config, last_error, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7::jsonb, '{}'::jsonb), $8, now())
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  kind = EXCLUDED.kind,
+  base_url = EXCLUDED.base_url,
+  capabilities = EXCLUDED.capabilities,
+  last_error = EXCLUDED.last_error,
+  updated_at = now()
+RETURNING id, name, kind, base_url, enabled, capabilities, config, last_error, updated_at::text`, input.ID, input.Name, input.Kind, input.BaseURL, input.Enabled, input.Capabilities, string(configBytes), input.LastError))
+}
+
+func (r *PostgresRepository) UpdateSourceExtension(ctx context.Context, id string, patch types.SourceExtensionPatch) (types.SourceExtension, bool, error) {
+	current, err := querySourceExtension(ctx, r.pool.QueryRow(ctx, `
+SELECT id, name, kind, base_url, enabled, capabilities, config, last_error, updated_at::text
+FROM admin_source_extensions
+WHERE id = $1`, id))
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return types.SourceExtension{}, false, nil
+		}
+		return types.SourceExtension{}, false, err
+	}
+	if patch.Enabled != nil {
+		current.Enabled = *patch.Enabled
+	}
+	if patch.Config != nil {
+		current.Config = patch.Config
+	}
+	configBytes, err := json.Marshal(current.Config)
+	if err != nil {
+		return types.SourceExtension{}, false, err
+	}
+	updated, err := querySourceExtension(ctx, r.pool.QueryRow(ctx, `
+UPDATE admin_source_extensions
+SET enabled = $2, config = COALESCE($3::jsonb, '{}'::jsonb), updated_at = now()
+WHERE id = $1
+RETURNING id, name, kind, base_url, enabled, capabilities, config, last_error, updated_at::text`, id, current.Enabled, string(configBytes)))
+	return updated, true, err
 }
 
 func (r *PostgresRepository) UpsertSeries(ctx context.Context, input types.SeriesInput) (types.SeriesDetail, error) {

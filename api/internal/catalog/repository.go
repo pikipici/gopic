@@ -29,11 +29,19 @@ type Store interface {
 }
 
 type Repository struct {
-	series []types.Series
+	series           []types.Series
+	sourceExtensions *sourceExtensionStore
 }
 
 func NewRepository(series []types.Series) *Repository {
 	return &Repository{series: series}
+}
+
+func (r *Repository) extensions() *sourceExtensionStore {
+	if r.sourceExtensions == nil {
+		r.sourceExtensions = &sourceExtensionStore{items: map[string]types.SourceExtension{}}
+	}
+	return r.sourceExtensions
 }
 
 func (r *Repository) List(ctx context.Context, query Query) ([]types.SeriesSummary, int, error) {

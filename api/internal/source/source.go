@@ -51,6 +51,10 @@ type Source interface {
 	Pages(ctx context.Context, seriesID, chapterSlug string) ([]types.ChapterPage, error)
 }
 
+type HealthCheck interface {
+	Health(ctx context.Context) error
+}
+
 type Registry struct {
 	sources map[string]Source
 }
@@ -58,6 +62,13 @@ type Registry struct {
 type Summary struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+type Status struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Healthy bool   `json:"healthy"`
+	Message string `json:"message"`
 }
 
 func NewRegistry(sources ...Source) *Registry {
@@ -79,6 +90,21 @@ func (r *Registry) List() []Summary {
 func (r *Registry) Get(id string) (Source, bool) {
 	item, ok := r.sources[id]
 	return item, ok
+}
+
+func (r *Registry) Status(ctx context.Context, id string) (Status, bool) {
+	item, ok := r.sources[id]
+	if !ok {
+		return Status{}, false
+	}
+	status := Status{ID: item.ID(), Name: item.Name(), Healthy: true, Message: "ok"}
+	if checker, ok := item.(HealthCheck); ok {
+		if err := checker.Health(ctx); err != nil {
+			status.Healthy = false
+			status.Message = err.Error()
+		}
+	}
+	return status, true
 }
 
 func MatchText(query string, values ...string) bool {

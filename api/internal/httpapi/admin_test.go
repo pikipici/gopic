@@ -3,6 +3,7 @@ package httpapi
 import (
 	"archive/zip"
 	"bytes"
+	"context"
 	"encoding/json"
 	"mime/multipart"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 
 	"gomic-api/internal/catalog"
 	"gomic-api/internal/seed"
+	"gomic-api/internal/types"
 )
 
 func TestAdminLoginAndSeriesCreate(t *testing.T) {
@@ -119,6 +121,92 @@ func TestAdminChapterAndPagesCreate(t *testing.T) {
 	}
 }
 
+func TestAdminExtensionsListAndPatch(t *testing.T) {
+	repo := catalog.NewRepository(seed.Series())
+	_, err := repo.UpsertSourceExtension(context.Background(), types.SourceExtensionInput{
+		ID:           "mock-mihon",
+		Name:         "Mock Mihon Source",
+		Kind:         "mock",
+		Enabled:      true,
+		Capabilities: []string{"search", "detail", "import", "pages"},
+		Config:       map[string]any{},
+	})
+	if err != nil {
+		t.Fatalf("seed extension: %v", err)
+	}
+	handler := NewHandler(repo, WithAdminToken("dev-token")).Routes()
+
+	listRecorder := httptest.NewRecorder()
+	listRequest := httptest.NewRequest(http.MethodGet, "/api/v1/admin/extensions", nil)
+	listRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(listRecorder, listRequest)
+	if listRecorder.Code != http.StatusOK {
+		t.Fatalf("expected extensions list 200, got %d body=%s", listRecorder.Code, listRecorder.Body.String())
+	}
+
+	statusRecorder := httptest.NewRecorder()
+	statusRequest := httptest.NewRequest(http.MethodGet, "/api/v1/admin/extensions/mock-mihon/status", nil)
+	statusRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(statusRecorder, statusRequest)
+	if statusRecorder.Code != http.StatusOK {
+		t.Fatalf("expected extension status 200, got %d body=%s", statusRecorder.Code, statusRecorder.Body.String())
+	}
+
+	patchRecorder := httptest.NewRecorder()
+	patchRequest := httptest.NewRequest(http.MethodPatch, "/api/v1/admin/extensions/mock-mihon", bytes.NewBufferString(`{"enabled":false}`))
+	patchRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(patchRecorder, patchRequest)
+	if patchRecorder.Code != http.StatusOK {
+		t.Fatalf("expected extension patch 200, got %d body=%s", patchRecorder.Code, patchRecorder.Body.String())
+	}
+
+	searchRecorder := httptest.NewRecorder()
+	searchRequest := httptest.NewRequest(http.MethodGet, "/api/v1/admin/sources/mock-mihon/search?q=neon", nil)
+	searchRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(searchRecorder, searchRequest)
+	if searchRecorder.Code != http.StatusConflict {
+		t.Fatalf("expected disabled source search 409, got %d body=%s", searchRecorder.Code, searchRecorder.Body.String())
+	}
+}
+
+func TestAdminSyncSourceRejectsDisabledExtension(t *testing.T) {
+	repo := catalog.NewRepository(seed.Series())
+	_, err := repo.UpsertSourceExtension(context.Background(), types.SourceExtensionInput{
+		ID:           "mock-mihon",
+		Name:         "Mock Mihon Source",
+		Kind:         "mock",
+		Enabled:      false,
+		Capabilities: []string{"search", "detail", "import", "pages"},
+		Config:       map[string]any{},
+	})
+	if err != nil {
+		t.Fatalf("seed extension: %v", err)
+	}
+	_, err = repo.UpsertSeries(context.Background(), types.SeriesInput{
+		Slug:           "linked-disabled-source",
+		Title:          "Linked Disabled Source",
+		Type:           types.SeriesTypeComic,
+		Status:         types.SeriesStatusOngoing,
+		ContentRating:  types.ContentRatingTeen,
+		Demographic:    types.DemographicGeneral,
+		ReleaseYear:    2026,
+		SourceID:       "mock-mihon",
+		SourceSeriesID: "neon-rain",
+	})
+	if err != nil {
+		t.Fatalf("seed linked series: %v", err)
+	}
+	handler := NewHandler(repo, WithAdminToken("dev-token")).Routes()
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodPost, "/api/v1/admin/series/linked-disabled-source/sync-source", bytes.NewBufferString(`{"metadataOnly":true}`))
+	request.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(recorder, request)
+	if recorder.Code != http.StatusConflict {
+		t.Fatalf("expected disabled sync 409, got %d body=%s", recorder.Code, recorder.Body.String())
+	}
+}
+
 func TestAdminChapterCBZImport(t *testing.T) {
 	uploadDir := t.TempDir()
 	handler := NewHandler(catalog.NewRepository(seed.Series()), WithAdminToken("dev-token"), WithUploadDir(uploadDir)).Routes()
@@ -202,7 +290,7 @@ func TestAdminSourceSearchAndImport(t *testing.T) {
 	waitForJob(t, handler, importRecorder.Body.Bytes())
 
 	syncRecorder := httptest.NewRecorder()
-	syncRequest := httptest.NewRequest(http.MethodPost, "/api/v1/admin/series/neon-rain-protocol/sync-source", nil)
+	syncRequest := httptest.NewRequest(http.MethodPost, "/api/v1/admin/series/neon-rain-protocol/sync-source", bytes.NewBufferString(`{"metadataOnly":true,"cachePages":true}`))
 	syncRequest.Header.Set("Authorization", "Bearer dev-token")
 	handler.ServeHTTP(syncRecorder, syncRequest)
 	if syncRecorder.Code != http.StatusAccepted {
@@ -228,6 +316,33 @@ func TestAdminSourceSearchAndImport(t *testing.T) {
 	}
 	if len(jobsResponse.Data) < 2 || jobsResponse.Data[0].Status == "" {
 		t.Fatalf("unexpected jobs list payload: %#v", jobsResponse.Data)
+	}
+
+	var syncCreateResponse struct {
+		Data struct {
+			ID string `json:"id"`
+		} `json:"data"`
+	}
+	if err := json.Unmarshal(syncRecorder.Body.Bytes(), &syncCreateResponse); err != nil {
+		t.Fatalf("decode sync job create response: %v", err)
+	}
+	syncDetailRecorder := httptest.NewRecorder()
+	syncDetailRequest := httptest.NewRequest(http.MethodGet, "/api/v1/admin/jobs/"+syncCreateResponse.Data.ID, nil)
+	syncDetailRequest.Header.Set("Authorization", "Bearer dev-token")
+	handler.ServeHTTP(syncDetailRecorder, syncDetailRequest)
+	if syncDetailRecorder.Code != http.StatusOK {
+		t.Fatalf("expected sync job detail 200, got %d body=%s", syncDetailRecorder.Code, syncDetailRecorder.Body.String())
+	}
+	var syncDetail struct {
+		Data struct {
+			Payload map[string]any `json:"payload"`
+		} `json:"data"`
+	}
+	if err := json.NewDecoder(syncDetailRecorder.Body).Decode(&syncDetail); err != nil {
+		t.Fatalf("decode sync job detail: %v", err)
+	}
+	if syncDetail.Data.Payload["metadataOnly"] != true || syncDetail.Data.Payload["cachePages"] != false {
+		t.Fatalf("expected normalized sync payload, got %#v", syncDetail.Data.Payload)
 	}
 
 	readerRecorder := httptest.NewRecorder()
