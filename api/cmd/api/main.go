@@ -125,6 +125,13 @@ func main() {
 
 	handler := httpapi.NewHandler(repo, httpapi.WithAdminToken(cfg.AdminToken), httpapi.WithUploadDir(cfg.UploadDir), httpapi.WithExtensionCatalogPath(cfg.CatalogPath), httpapi.WithJobStore(jobStore), httpapi.WithSourceRegistry(sourceRegistry), httpapi.WithImageHeaders(cfg.ImageHeaders))
 
+	if count, err := handler.SyncCatalogExtensions(ctx); err != nil {
+		slog.Error("sync catalog extensions", "error", err)
+		os.Exit(1)
+	} else if count > 0 {
+		slog.Info("synced catalog extensions", "count", count)
+	}
+
 	httpapi.StartCleanupLoop(ctx, jobStore, imagecache.NewWithHeaders(cfg.UploadDir, cfg.ImageHeaders), httpapi.CleanupOptions{
 		Interval:     cfg.CleanupInterval,
 		JobRetention: cfg.JobRetention,

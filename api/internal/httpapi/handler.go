@@ -123,6 +123,7 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("POST /api/v1/admin/extensions", h.requireAdmin(h.adminExtensionCreate))
 	mux.HandleFunc("GET /api/v1/admin/extensions/catalog", h.requireAdmin(h.adminExtensionCatalogList))
 	mux.HandleFunc("POST /api/v1/admin/extensions/catalog/{extensionID}/install", h.requireAdmin(h.adminExtensionCatalogInstall))
+	mux.HandleFunc("POST /api/v1/admin/extensions/catalog/sync", h.requireAdmin(h.adminExtensionCatalogSync))
 	mux.HandleFunc("GET /api/v1/admin/extensions/{sourceID}/status", h.requireAdmin(h.adminExtensionStatus))
 	mux.HandleFunc("PATCH /api/v1/admin/extensions/{sourceID}", h.requireAdmin(h.adminExtensionPatch))
 	mux.HandleFunc("DELETE /api/v1/admin/extensions/{sourceID}", h.requireAdmin(h.adminExtensionDelete))
@@ -335,6 +336,47 @@ func (h *Handler) adminExtensionCatalogInstall(w http.ResponseWriter, r *http.Re
 	}
 	h.registerRuntimeExtension(item)
 	writeEnvelope(w, http.StatusCreated, item, map[string]any{})
+}
+
+func (h *Handler) adminExtensionCatalogSync(w http.ResponseWriter, r *http.Request) {
+	count, err := h.SyncCatalogExtensions(r.Context())
+	if err != nil {
+		writeError(w, http.StatusBadGateway, "catalog_unavailable", err.Error())
+		return
+	}
+	writeEnvelope(w, http.StatusOK, map[string]any{"synced": count}, map[string]any{})
+}
+
+func (h *Handler) SyncCatalogExtensions(ctx context.Context) (int, error) {
+	if h.adminRepo == nil {
+		return 0, nil
+	}
+	available, err := h.availableExtensions()
+	if err != nil {
+		return 0, err
+	}
+	synced := 0
+	for _, item := range available {
+		input := normalizeExtensionInput(types.SourceExtensionInput{
+			ID:           item.ID,
+			Name:         item.Name,
+			Kind:         item.Kind,
+			BaseURL:      item.BaseURL,
+			Enabled:      true,
+			Capabilities: item.Capabilities,
+			Config:       item.Config,
+		})
+		if existing, ok, _ := h.adminRepo.GetSourceExtension(ctx, input.ID); ok {
+			input.Enabled = existing.Enabled
+		}
+		ext, err := h.adminRepo.UpsertSourceExtension(ctx, input)
+		if err != nil {
+			return synced, err
+		}
+		h.registerRuntimeExtension(ext)
+		synced++
+	}
+	return synced, nil
 }
 
 func (h *Handler) adminExtensionPatch(w http.ResponseWriter, r *http.Request) {
