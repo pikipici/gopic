@@ -18,6 +18,7 @@ type ChapterInput = {
 };
 
 type SourceSummary = { id: string; name: string; kind?: string; baseUrl?: string; enabled?: boolean; capabilities?: string[]; lastError?: string; updatedAt?: string };
+type AvailableExtension = { id: string; name: string; kind: string; baseUrl: string; description: string; language: string; version?: string; author?: string; homepage?: string; capabilities: string[]; config?: Record<string,unknown>; adapterAvailable: boolean };
 type SourceExtensionForm = { id: string; name: string; baseUrl: string; enabled: boolean; headersJSON: string; editingID: string };
 type SourceStatus = { id: string; name: string; healthy: boolean; message: string; enabled: boolean };
 type SourceResult = { sourceId: string; id: string; title: string; url: string; coverUrl: string };
@@ -201,6 +202,8 @@ export default function AdminPage() {
   const [savedToken, setSavedToken] = useState("");
   const [series, setSeries] = useState<SeriesSummary[]>([]);
   const [sources, setSources] = useState<SourceSummary[]>([]);
+  const [catalogExtensions, setCatalogExtensions] = useState<AvailableExtension[]>([]);
+  const [catalogFilter, setCatalogFilter] = useState<"all" | "ready" | "no-adapter">("ready");
   const [sourceStatuses, setSourceStatuses] = useState<Record<string, SourceStatus>>({});
   const [sourceForm, setSourceForm] = useState<SourceExtensionForm>(() => emptyExtensionForm());
   const [activeSourceId, setActiveSourceId] = useState("");
@@ -279,6 +282,12 @@ export default function AdminPage() {
       if (current && data.some((item) => item.id === current && sourceEnabled(item))) return current;
       return data.find(sourceEnabled)?.id || data[0]?.id || "";
     });
+    return data;
+  }, [savedToken]);
+
+  const loadCatalog = useCallback(async (authToken = savedToken) => {
+    const data = await adminFetch<AvailableExtension[]>("/api/v1/admin/extensions/catalog", authToken);
+    setCatalogExtensions(data);
     return data;
   }, [savedToken]);
 
@@ -626,6 +635,7 @@ export default function AdminPage() {
       window.localStorage.setItem("gomic-admin-token", envelope.data.token);
       setSavedToken(envelope.data.token);
       setMessage("Login sukses. Loading series dan source...");
+      await loadCatalog(envelope.data.token);
       const loadedSources = await loadSources(envelope.data.token);
       await loadSourceStatuses(loadedSources, envelope.data.token);
       await loadSeries(envelope.data.token);
@@ -724,6 +734,11 @@ export default function AdminPage() {
     completed: completedJobs,
   };
   const emptyJobMessage = jobFilter === "all" ? "Belum ada job. Import atau sync source dulu." : `Tidak ada ${jobFilter} job di recent window.`;
+  const filteredExtensions = catalogExtensions.filter((ext) => {
+    if (catalogFilter === "ready") return ext.adapterAvailable || sources.some((s: SourceSummary) => s.id === ext.id);
+    if (catalogFilter === "no-adapter") return !ext.adapterAvailable && !sources.some((s: SourceSummary) => s.id === ext.id);
+    return true;
+  });
   const activeSourceName = sources.find((item) => item.id === activeSourceId)?.name ?? (activeSourceId || "No source");
   const activeSourcePresets = presetsForSource(activeSourceId);
   const activeJobSeriesID = jobSeriesID(activeJob);
@@ -887,9 +902,9 @@ export default function AdminPage() {
         <div className="mt-5 rounded-3xl border border-white/10 bg-black/20 p-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-sky-200">Source availability</p>
-              <h3 className="mt-1 font-black">Extension adapters</h3>
-              <p className="mt-1 text-xs text-muted">Semua extension dari catalog langsung tersedia — tinggal enable/disable.</p>
+              <p className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-sky-200">Extension catalog</p>
+              <h3 className="mt-1 font-black">Keiyoushi + Local extensions</h3>
+              <p className="mt-1 text-xs text-muted">{catalogExtensions.length} extensions dari keiyoushi + lokal. Enable untuk source yang sudah ada adapter.</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <button onClick={() => void handleCatalogSync()} disabled={!savedToken || busy} className="rounded-full border border-lime-200/30 px-3 py-1 text-xs font-bold text-lime-100 transition hover:bg-lime-200 hover:text-black disabled:opacity-40">
@@ -898,58 +913,73 @@ export default function AdminPage() {
               <button onClick={() => void loadSourceStatuses()} disabled={!savedToken || busy || sources.length === 0} className="rounded-full border border-sky-200/25 px-3 py-1 text-xs font-bold text-sky-100 transition hover:bg-sky-200 hover:text-black disabled:opacity-40">
                 Refresh status
               </button>
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-bold text-muted">{sources.length} loaded</span>
             </div>
           </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {(["ready", "no-adapter", "all"] as const).map((filter) => (
+              <button key={filter} onClick={() => setCatalogFilter(filter)} className={`rounded-full px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] ring-1 transition ${catalogFilter === filter ? "bg-sky-200 text-black ring-sky-200" : "bg-white/5 text-muted ring-white/10 hover:bg-white/10"}`}>
+                {filter === "ready" ? "Ready" : filter === "no-adapter" ? "No adapter" : "All"} {filter === "ready" ? `(${catalogExtensions.filter((e: AvailableExtension) => e.adapterAvailable || sources.some((s: SourceSummary) => s.id === e.id)).length})` : filter === "no-adapter" ? `(${catalogExtensions.filter((e: AvailableExtension) => !e.adapterAvailable && !sources.some((s: SourceSummary) => s.id === e.id)).length})` : `(${catalogExtensions.length})`}
+              </button>
+            ))}
+          </div>
           <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {sources.map((source) => {
-              const active = activeSourceId === source.id;
-              const enabled = sourceEnabled(source);
-              const status = sourceStatuses[source.id];
+            {filteredExtensions.map((ext) => {
+              const source = sources.find((s: SourceSummary) => s.id === ext.id);
+              const active = activeSourceId === ext.id;
+              const enabled = source ? sourceEnabled(source) : false;
+              const hasAdapter = ext.adapterAvailable || Boolean(source);
+              const status = sourceStatuses[ext.id];
               return (
                 <article
-                  key={source.id}
-                  className={`rounded-2xl border p-3 text-left transition ${active ? "border-sky-200/50 bg-sky-200/15 text-sky-50" : "border-white/10 bg-white/[0.03] text-zinc-100"} ${enabled ? "" : "opacity-75"}`}
+                  key={ext.id}
+                  className={`rounded-2xl border p-3 text-left transition ${active ? "border-sky-200/50 bg-sky-200/15 text-sky-50" : hasAdapter ? "border-white/10 bg-white/[0.03] text-zinc-100" : "border-white/[0.04] bg-white/[0.01] text-zinc-500"}`}
                 >
-                  <button type="button" onClick={() => setActiveSourceId(source.id)} disabled={!savedToken || busy || !enabled} className="block w-full text-left disabled:cursor-not-allowed">
-                    <span className="block font-bold">{source.name}</span>
-                    <span className="mt-1 block font-mono text-[0.65rem] text-muted">{source.id}</span>
-                    {source.baseUrl ? <span className="mt-1 block truncate font-mono text-[0.65rem] text-muted">{source.baseUrl}</span> : null}
+                  <button type="button" onClick={() => hasAdapter ? setActiveSourceId(ext.id) : null} disabled={!savedToken || busy || !hasAdapter} className="block w-full text-left disabled:cursor-not-allowed">
+                    <span className="block truncate font-bold">{ext.name}</span>
+                    <span className="mt-1 block truncate font-mono text-[0.6rem] text-muted">{ext.id}</span>
+                    <span className="mt-0.5 block truncate font-mono text-[0.6rem] text-muted/70">{ext.baseUrl}</span>
                   </button>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <span className={`inline-flex rounded-full px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.18em] ring-1 ${active ? "bg-sky-200 text-black ring-sky-100/50" : enabled ? "bg-lime-300/15 text-lime-200 ring-lime-300/20" : "bg-zinc-200/10 text-zinc-300 ring-white/10"}`}>
-                      {active ? "Selected" : enabled ? "Enabled" : "Disabled"}
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-[0.6rem] font-black uppercase tracking-[0.14em] ring-1 ${active ? "bg-sky-200 text-black ring-sky-100/50" : hasAdapter && enabled ? "bg-lime-300/15 text-lime-200 ring-lime-300/20" : hasAdapter ? "bg-zinc-200/10 text-zinc-300 ring-white/10" : "bg-amber-200/10 text-amber-200/60 ring-amber-200/15"}`}>
+                      {active ? "Selected" : hasAdapter ? (enabled ? "Enabled" : "Disabled") : "No adapter"}
                     </span>
-                    <span className={`inline-flex rounded-full px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.18em] ring-1 ${sourceHealthClass(status)}`}>
-                      {sourceHealthLabel(source, status)}
-                    </span>
-                    {source.kind ? <span className="inline-flex rounded-full bg-white/10 px-2 py-1 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-muted">{source.kind}</span> : null}
+                    {hasAdapter && status ? <span className={`inline-flex rounded-full px-2 py-0.5 text-[0.6rem] font-black uppercase tracking-[0.14em] ring-1 ${sourceHealthClass(status)}`}>{sourceHealthLabel(source!, status)}</span> : null}
+                    <span className="inline-flex rounded-full bg-white/10 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-muted">{ext.language || "en"}</span>
+                    {ext.version ? <span className="inline-flex rounded-full bg-white/10 px-2 py-0.5 text-[0.6rem] text-muted">v{ext.version}</span> : null}
                   </div>
-                  {status?.message ? <p className="mt-3 line-clamp-2 text-xs text-muted">{status.message}</p> : null}
-                  {source.lastError ? <p className="mt-3 line-clamp-2 text-xs text-red-100">{source.lastError}</p> : null}
-                  {source.capabilities?.length ? <p className="mt-3 text-xs text-muted">Capabilities: {source.capabilities.join(", ")}</p> : null}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button type="button" onClick={() => void handleSourceStatusRefresh(source.id)} disabled={!savedToken || busy} className="rounded-xl border border-white/10 px-3 py-2 text-xs font-black text-zinc-100 transition hover:bg-white hover:text-black disabled:opacity-40">
-                      Check
-                    </button>
-                    <button type="button" onClick={() => void handleSourceToggle(source)} disabled={!savedToken || busy} className={`rounded-xl border px-3 py-2 text-xs font-black transition disabled:opacity-40 ${enabled ? "border-amber-200/35 text-amber-100 hover:bg-amber-200 hover:text-black" : "border-lime-200/35 text-lime-100 hover:bg-lime-200 hover:text-black"}`}>
-                      {enabled ? "Disable" : "Enable"}
-                    </button>
-                    {source.kind === "json-http" ? (
-                      <button type="button" onClick={() => setSourceForm(extensionFormFromSource(source))} disabled={!savedToken || busy} className="rounded-xl border border-sky-200/30 px-3 py-2 text-xs font-black text-sky-100 transition hover:bg-sky-200 hover:text-black disabled:opacity-40">
-                        Edit
-                      </button>
-                    ) : null}
-                    {source.kind === "json-http" ? (
-                      <button type="button" onClick={() => void handleSourceDelete(source)} disabled={!savedToken || busy} className="rounded-xl border border-red-200/35 px-3 py-2 text-xs font-black text-red-100 transition hover:bg-red-200 hover:text-black disabled:opacity-40">
-                        Delete
-                      </button>
+                  {ext.description ? <p className="mt-2 line-clamp-2 text-xs text-muted">{ext.description}</p> : null}
+                  {ext.capabilities && ext.capabilities.length > 0 ? <p className="mt-2 text-xs text-muted">{ext.capabilities.join(" · ")}</p> : null}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {source && source.kind === "json-http" ? (
+                      <>
+                        <button type="button" onClick={() => void handleSourceToggle(source)} disabled={!savedToken || busy} className={`rounded-xl border px-2 py-1 text-xs font-black transition disabled:opacity-40 ${enabled ? "border-amber-200/35 text-amber-100 hover:bg-amber-200 hover:text-black" : "border-lime-200/35 text-lime-100 hover:bg-lime-200 hover:text-black"}`}>
+                          {enabled ? "Disable" : "Enable"}
+                        </button>
+                        <button type="button" onClick={() => void handleSourceStatusRefresh(ext.id)} disabled={!savedToken || busy} className="rounded-xl border border-white/10 px-2 py-1 text-xs font-black text-zinc-100 transition hover:bg-white hover:text-black disabled:opacity-40">
+                          Check
+                        </button>
+                        <button type="button" onClick={() => setSourceForm(extensionFormFromSource(source))} disabled={!savedToken || busy} className="rounded-xl border border-sky-200/30 px-2 py-1 text-xs font-black text-sky-100 transition hover:bg-sky-200 hover:text-black disabled:opacity-40">
+                          Edit
+                        </button>
+                        <button type="button" onClick={() => void handleSourceDelete(source)} disabled={!savedToken || busy} className="rounded-xl border border-red-200/35 px-2 py-1 text-xs font-black text-red-100 transition hover:bg-red-200 hover:text-black disabled:opacity-40">
+                          Delete
+                        </button>
+                      </>
+                    ) : hasAdapter && source ? (
+                      <>
+                        <button type="button" onClick={() => void handleSourceToggle(source)} disabled={!savedToken || busy} className={`rounded-xl border px-2 py-1 text-xs font-black transition disabled:opacity-40 ${enabled ? "border-amber-200/35 text-amber-100 hover:bg-amber-200 hover:text-black" : "border-lime-200/35 text-lime-100 hover:bg-lime-200 hover:text-black"}`}>
+                          {enabled ? "Disable" : "Enable"}
+                        </button>
+                        <button type="button" onClick={() => void handleSourceStatusRefresh(ext.id)} disabled={!savedToken || busy} className="rounded-xl border border-white/10 px-2 py-1 text-xs font-black text-zinc-100 transition hover:bg-white hover:text-black disabled:opacity-40">
+                          Check
+                        </button>
+                      </>
                     ) : null}
                   </div>
                 </article>
               );
             })}
-            {sources.length === 0 ? <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-muted">Source belum loaded. Login dulu atau cek API/scraper stack.</p> : null}
+            {filteredExtensions.length === 0 ? <p className="col-span-full rounded-2xl border border-dashed border-white/10 p-4 text-sm text-muted">Tidak ada extension di filter ini. Pilih All atau Sync from catalog.</p> : null}
           </div>
           <form onSubmit={handleSourceExtensionSubmit} className="mt-4 rounded-3xl border border-sky-200/15 bg-sky-200/[0.05] p-4">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">

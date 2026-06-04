@@ -27,14 +27,16 @@ import (
 )
 
 type Handler struct {
-	repo         catalog.Store
-	adminRepo    catalog.AdminStore
-	adminToken   string
-	uploadDir    string
-	catalogPath  string
-	imageHeaders map[string]string
-	sources      *source.Registry
-	jobs         jobs.Store
+	repo                catalog.Store
+	adminRepo           catalog.AdminStore
+	adminToken          string
+	uploadDir           string
+	catalogPath         string
+	keiyoushiCatalogURL string
+	adapterMapPath      string
+	imageHeaders        map[string]string
+	sources             *source.Registry
+	jobs                jobs.Store
 }
 
 type envelope struct {
@@ -49,7 +51,7 @@ type apiError struct {
 }
 
 func NewHandler(repo catalog.Store, options ...Option) *Handler {
-	h := &Handler{repo: repo, uploadDir: "./uploads", catalogPath: "./extension-catalog.json", sources: source.NewRegistry(source.NewMockSource()), jobs: jobs.NewStore()}
+	h := &Handler{repo: repo, uploadDir: "./uploads", catalogPath: "./extension-catalog.json", keiyoushiCatalogURL: "https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.min.json", adapterMapPath: "./adapter-map.json", sources: source.NewRegistry(source.NewMockSource()), jobs: jobs.NewStore()}
 	if adminRepo, ok := repo.(catalog.AdminStore); ok {
 		h.adminRepo = adminRepo
 	}
@@ -79,6 +81,22 @@ func WithExtensionCatalogPath(path string) Option {
 	return func(h *Handler) {
 		if strings.TrimSpace(path) != "" {
 			h.catalogPath = path
+		}
+	}
+}
+
+func WithKeiyoushiCatalogURL(url string) Option {
+	return func(h *Handler) {
+		if url != "" {
+			h.keiyoushiCatalogURL = url
+		}
+	}
+}
+
+func WithAdapterMapPath(path string) Option {
+	return func(h *Handler) {
+		if path != "" {
+			h.adapterMapPath = path
 		}
 	}
 }
@@ -433,47 +451,7 @@ func (h *Handler) adminExtensionDelete(w http.ResponseWriter, r *http.Request) {
 var sourceExtensionIDPattern = regexp.MustCompile(`^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$`)
 
 func (h *Handler) availableExtensions() ([]types.AvailableSourceExtension, error) {
-	data, err := h.readExtensionCatalog()
-	if err != nil {
-		return nil, err
-	}
-	var catalogIndex types.SourceExtensionCatalog
-	if err := json.Unmarshal(data, &catalogIndex); err != nil {
-		return nil, fmt.Errorf("extension catalog is invalid")
-	}
-	items := make([]types.AvailableSourceExtension, 0, len(catalogIndex.Extensions))
-	seen := map[string]bool{}
-	for _, item := range catalogIndex.Extensions {
-		input := normalizeExtensionInput(types.SourceExtensionInput{
-			ID:           item.ID,
-			Name:         item.Name,
-			Kind:         item.Kind,
-			BaseURL:      item.BaseURL,
-			Enabled:      true,
-			Capabilities: item.Capabilities,
-			Config:       item.Config,
-		})
-		if seen[input.ID] || validateExtensionInput(input) != nil {
-			continue
-		}
-		seen[input.ID] = true
-		item.ID = input.ID
-		item.Name = input.Name
-		item.Kind = input.Kind
-		item.BaseURL = input.BaseURL
-		item.Capabilities = input.Capabilities
-		if item.Config == nil {
-			item.Config = map[string]any{}
-		}
-		items = append(items, item)
-	}
-	sort.Slice(items, func(i, j int) bool {
-		if items[i].Language != items[j].Language {
-			return items[i].Language < items[j].Language
-		}
-		return items[i].Name < items[j].Name
-	})
-	return items, nil
+	return h.mergeCatalogs(context.Background())
 }
 
 func (h *Handler) readExtensionCatalog() ([]byte, error) {

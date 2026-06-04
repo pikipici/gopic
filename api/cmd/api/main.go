@@ -123,7 +123,7 @@ func main() {
 		}
 	}
 
-	handler := httpapi.NewHandler(repo, httpapi.WithAdminToken(cfg.AdminToken), httpapi.WithUploadDir(cfg.UploadDir), httpapi.WithExtensionCatalogPath(cfg.CatalogPath), httpapi.WithJobStore(jobStore), httpapi.WithSourceRegistry(sourceRegistry), httpapi.WithImageHeaders(cfg.ImageHeaders))
+	handler := httpapi.NewHandler(repo, httpapi.WithAdminToken(cfg.AdminToken), httpapi.WithUploadDir(cfg.UploadDir), httpapi.WithExtensionCatalogPath(cfg.CatalogPath), httpapi.WithKeiyoushiCatalogURL(cfg.KeiyoushiCatalogURL), httpapi.WithAdapterMapPath(cfg.AdapterMapPath), httpapi.WithJobStore(jobStore), httpapi.WithSourceRegistry(sourceRegistry), httpapi.WithImageHeaders(cfg.ImageHeaders))
 
 	if count, err := handler.SyncCatalogExtensions(ctx); err != nil {
 		slog.Error("sync catalog extensions", "error", err)

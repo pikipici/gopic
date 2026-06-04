@@ -25,8 +25,10 @@ type Config struct {
 	SourceURL       string
 	SourceHeaders   map[string]string
 	Sources         []SourceConfig
-	CatalogPath     string
-	ImageHeaders    map[string]string
+	CatalogPath         string
+	KeiyoushiCatalogURL string
+	AdapterMapPath      string
+	ImageHeaders        map[string]string
 	CleanupInterval time.Duration
 	JobRetention    time.Duration
 	CacheTTL        time.Duration
@@ -57,6 +59,14 @@ func Load() Config {
 	cfg.CatalogPath = strings.TrimSpace(os.Getenv("EXTENSION_CATALOG_PATH"))
 	if cfg.CatalogPath == "" {
 		cfg.CatalogPath = "./extension-catalog.json"
+	}
+	cfg.KeiyoushiCatalogURL = strings.TrimSpace(os.Getenv("KEIYOUSHI_CATALOG_URL"))
+	if cfg.KeiyoushiCatalogURL == "" {
+		cfg.KeiyoushiCatalogURL = "https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.min.json"
+	}
+	cfg.AdapterMapPath = strings.TrimSpace(os.Getenv("ADAPTER_MAP_PATH"))
+	if cfg.AdapterMapPath == "" {
+		cfg.AdapterMapPath = "./adapter-map.json"
 	}
 	if cfg.SourceURL != "" {
 		cfg.Sources = append(cfg.Sources, SourceConfig{ID: cfg.SourceID, Name: cfg.SourceName, URL: cfg.SourceURL, Headers: cfg.SourceHeaders})
