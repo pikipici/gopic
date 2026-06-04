@@ -1,50 +1,10 @@
 {
-  "komikcast": {
-    "adapter": true,
-    "name": "KomikCast",
-    "kind": "json-http",
-    "baseUrl": "http://localhost:19190"
-  },
-  "komikindo": {
-    "adapter": true,
-    "name": "KomikIndo",
-    "kind": "json-http",
-    "baseUrl": "http://localhost:19191"
-  },
-  "asurascans": {
-    "adapter": true,
-    "name": "Asura Scans",
-    "kind": "json-http",
-    "baseUrl": "http://localhost:19200"
-  },
-  "mangapill": {
-    "adapter": true,
-    "name": "MangaPill",
-    "kind": "json-http",
-    "baseUrl": "http://localhost:19201"
-  },
-  "weebcentral": {
-    "adapter": true,
-    "name": "Weeb Central",
-    "kind": "json-http",
-    "baseUrl": "http://localhost:19202"
-  },
-  "komiku": {
-    "adapter": true,
-    "name": "Komiku",
-    "kind": "json-http",
-    "baseUrl": "http://localhost:19203"
-  },
-  "mangasusu": {
-    "adapter": true,
-    "name": "Mangasusu",
-    "kind": "json-http",
-    "baseUrl": "http://localhost:19204"
-  },
-  "kiryuu": {
-    "adapter": true,
-    "name": "Kiryuu",
-    "kind": "json-http",
-    "baseUrl": "http://localhost:19205"
-  }
+  "komikcast": {"adapter": true, "name": "KomikCast", "kind": "json-http", "baseUrl": "http://localhost:19190"},
+  "komikindo": {"adapter": true, "name": "KomikIndo", "kind": "json-http", "baseUrl": "http://localhost:19191"},
+  "westmanga": {"adapter": true, "name": "WestManga", "kind": "json-http", "baseUrl": "http://localhost:19200"},
+  "komiktap": {"adapter": true, "name": "KomikTap", "kind": "json-http", "baseUrl": "http://localhost:19201"},
+  "komikindoco": {"adapter": true, "name": "KomikIndo.co", "kind": "json-http", "baseUrl": "http://localhost:19202"},
+  "manhuascan": {"adapter": true, "name": "ManhuaScan.us", "kind": "json-http", "baseUrl": "http://localhost:19203"},
+  "manhwalover": {"adapter": true, "name": "ManhwaLover", "kind": "json-http", "baseUrl": "http://localhost:19204"},
+  "manhwax": {"adapter": true, "name": "ManhwaX", "kind": "json-http", "baseUrl": "http://localhost:19205"}
 }

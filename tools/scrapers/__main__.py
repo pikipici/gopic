@@ -10,12 +10,12 @@ from . import build_config, run_scraper
 SOURCE_CONFIGS = {
     "komikcast": {"base_url": "https://v2.komikcast.fit", "referer": "https://v2.komikcast.fit/"},
     "komikindo": {"base_url": "https://komikindo.fit", "referer": "https://komikindo.fit/"},
-    "asurascans": {"base_url": "https://asurascans.com", "referer": "https://asurascans.com/"},
-    "mangapill": {"base_url": "https://mangapill.com", "referer": "https://mangapill.com/"},
-    "weebcentral": {"base_url": "https://weebcentral.com", "referer": "https://weebcentral.com/"},
-    "komiku": {"base_url": "https://komiku.org", "referer": "https://komiku.org/"},
-    "mangasusu": {"base_url": "https://mangasusuku.com", "referer": "https://mangasusuku.com/"},
-    "kiryuu": {"base_url": "https://kiryuu.to", "referer": "https://kiryuu.to/"},
+    "westmanga": {"base_url": "https://westmanga.co", "referer": "https://westmanga.co/"},
+    "komiktap": {"base_url": "https://komiktap.info", "referer": "https://komiktap.info/"},
+    "komikindoco": {"base_url": "https://komikindo.co", "referer": "https://komikindo.co/"},
+    "manhuascan": {"base_url": "https://manhuascan.us", "referer": "https://manhuascan.us/"},
+    "manhwalover": {"base_url": "https://manhwalover.org", "referer": "https://manhwalover.org/"},
+    "manhwax": {"base_url": "https://manhwax.com", "referer": "https://manhwax.com/"},
 }
 
 

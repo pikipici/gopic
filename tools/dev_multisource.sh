@@ -15,6 +15,12 @@ WEBCENTRAL_PORT=${WEBCENTRAL_PORT:-19202}
 KOMIKU_PORT=${KOMIKU_PORT:-19203}
 MANGASUSU_PORT=${MANGASUSU_PORT:-19204}
 KIRYUU_PORT=${KIRYUU_PORT:-19205}
+WESTMANGA_PORT=$ASURASCANS_PORT
+KOMIKTAP_PORT=$MANGAPILL_PORT
+KOMIKINDOCO_PORT=$WEBCENTRAL_PORT
+MANHUASCAN_PORT=$KOMIKU_PORT
+MANHWALOVER_PORT=$MANGASUSU_PORT
+MANHWAX_PORT=$KIRYUU_PORT
 ADMIN_TOKEN=${ADMIN_TOKEN:-dev-token}
 DATABASE_URL=${DATABASE_URL:-postgres://gomic:gomic_dev_password@localhost:5432/gomic?sslmode=disable}
 UPLOAD_DIR=${UPLOAD_DIR:-$API_DIR/uploads}
@@ -142,7 +148,7 @@ ensure_clean_web_port() {
 }
 
 SOURCES_JSON=$(cat <<JSON
-[{"id":"komikcast","name":"Komik Cast","url":"http://localhost:${KOMIKCAST_PORT}"},{"id":"komikindo","name":"KomikIndo","url":"http://localhost:${KOMIKINDO_PORT}"},{"id":"asurascans","name":"Asura Scans","url":"http://localhost:${ASURASCANS_PORT}"},{"id":"mangapill","name":"MangaPill","url":"http://localhost:${MANGAPILL_PORT}"},{"id":"weebcentral","name":"Weeb Central","url":"http://localhost:${WEBCENTRAL_PORT}"},{"id":"komiku","name":"Komiku","url":"http://localhost:${KOMIKU_PORT}"},{"id":"mangasusu","name":"Mangasusu","url":"http://localhost:${MANGASUSU_PORT}"},{"id":"kiryuu","name":"Kiryuu","url":"http://localhost:${KIRYUU_PORT}"}]
+[{"id":"komikcast","name":"Komik Cast","url":"http://localhost:${KOMIKCAST_PORT}"},{"id":"komikindo","name":"KomikIndo","url":"http://localhost:${KOMIKINDO_PORT}"},{"id":"westmanga","name":"WestManga","url":"http://localhost:${WESTMANGA_PORT}"},{"id":"komiktap","name":"KomikTap","url":"http://localhost:${KOMIKTAP_PORT}"},{"id":"komikindoco","name":"KomikIndo.co","url":"http://localhost:${KOMIKINDOCO_PORT}"},{"id":"manhuascan","name":"ManhuaScan.us","url":"http://localhost:${MANHUASCAN_PORT}"},{"id":"manhwalover","name":"ManhwaLover","url":"http://localhost:${MANHWALOVER_PORT}"},{"id":"manhwax","name":"ManhwaX","url":"http://localhost:${MANHWAX_PORT}"}]
 JSON
 )
 
@@ -154,22 +160,22 @@ echo "Running database migrations..."
 
 ensure_clean_owned_port "$KOMIKCAST_PORT" "KomikCast scraper" 'source_service_scraper|scrapers|python'
 ensure_clean_owned_port "$KOMIKINDO_PORT" "KomikIndo scraper" 'source_service_scraper|scrapers|python'
-ensure_clean_owned_port "$ASURASCANS_PORT" "Asura Scans scraper" 'scrapers|python'
-ensure_clean_owned_port "$MANGAPILL_PORT" "MangaPill scraper" 'scrapers|python'
-ensure_clean_owned_port "$WEBCENTRAL_PORT" "Weeb Central scraper" 'scrapers|python'
-ensure_clean_owned_port "$KOMIKU_PORT" "Komiku scraper" 'scrapers|python'
-ensure_clean_owned_port "$MANGASUSU_PORT" "Mangasusu scraper" 'scrapers|python'
-ensure_clean_owned_port "$KIRYUU_PORT" "Kiryuu scraper" 'scrapers|python'
+ensure_clean_owned_port "$WESTMANGA_PORT" "WestManga scraper" 'scrapers|python'
+ensure_clean_owned_port "$KOMIKTAP_PORT" "KomikTap scraper" 'scrapers|python'
+ensure_clean_owned_port "$KOMIKINDOCO_PORT" "KomikIndo.co scraper" 'scrapers|python'
+ensure_clean_owned_port "$MANHUASCAN_PORT" "ManhuaScan scraper" 'scrapers|python'
+ensure_clean_owned_port "$MANHWALOVER_PORT" "ManhwaLover scraper" 'scrapers|python'
+ensure_clean_owned_port "$MANHWAX_PORT" "ManhwaX scraper" 'scrapers|python'
 ensure_clean_owned_port "$API_PORT" "Gomic API" 'gomic|cmd/api|go.exe|go run|api'
 
 start_service "KomikCast scraper" python -m tools.scrapers --source komikcast --port "$KOMIKCAST_PORT"
 start_service "KomikIndo scraper" python -m tools.scrapers --source komikindo --port "$KOMIKINDO_PORT"
-start_service "Asura Scans scraper" python -m tools.scrapers --source asurascans --port "$ASURASCANS_PORT"
-start_service "MangaPill scraper" python -m tools.scrapers --source mangapill --port "$MANGAPILL_PORT"
-start_service "Weeb Central scraper" python -m tools.scrapers --source weebcentral --port "$WEBCENTRAL_PORT"
-start_service "Komiku scraper" python -m tools.scrapers --source komiku --port "$KOMIKU_PORT"
-start_service "Mangasusu scraper" python -m tools.scrapers --source mangasusu --port "$MANGASUSU_PORT"
-start_service "Kiryuu scraper" python -m tools.scrapers --source kiryuu --port "$KIRYUU_PORT"
+start_service "WestManga scraper" python -m tools.scrapers --source westmanga --port "$WESTMANGA_PORT"
+start_service "KomikTap scraper" python -m tools.scrapers --source komiktap --port "$KOMIKTAP_PORT"
+start_service "KomikIndo.co scraper" python -m tools.scrapers --source komikindoco --port "$KOMIKINDOCO_PORT"
+start_service "ManhuaScan scraper" python -m tools.scrapers --source manhuascan --port "$MANHUASCAN_PORT"
+start_service "ManhwaLover scraper" python -m tools.scrapers --source manhwalover --port "$MANHWALOVER_PORT"
+start_service "ManhwaX scraper" python -m tools.scrapers --source manhwax --port "$MANHWAX_PORT"
 start_service "Gomic API" bash -c '
   cd "$1"
   shift
@@ -188,12 +194,12 @@ fi
 
 wait_for_url "KomikCast scraper" "http://localhost:$KOMIKCAST_PORT/healthz"
 wait_for_url "KomikIndo scraper" "http://localhost:$KOMIKINDO_PORT/healthz"
-wait_for_url "Asura Scans scraper" "http://localhost:$ASURASCANS_PORT/healthz"
-wait_for_url "MangaPill scraper" "http://localhost:$MANGAPILL_PORT/healthz"
-wait_for_url "Weeb Central scraper" "http://localhost:$WEBCENTRAL_PORT/healthz"
-wait_for_url "Komiku scraper" "http://localhost:$KOMIKU_PORT/healthz"
-wait_for_url "Mangasusu scraper" "http://localhost:$MANGASUSU_PORT/healthz"
-wait_for_url "Kiryuu scraper" "http://localhost:$KIRYUU_PORT/healthz"
+wait_for_url "WestManga scraper" "http://localhost:$WESTMANGA_PORT/healthz"
+wait_for_url "KomikTap scraper" "http://localhost:$KOMIKTAP_PORT/healthz"
+wait_for_url "KomikIndo.co scraper" "http://localhost:$KOMIKINDOCO_PORT/healthz"
+wait_for_url "ManhuaScan scraper" "http://localhost:$MANHUASCAN_PORT/healthz"
+wait_for_url "ManhwaLover scraper" "http://localhost:$MANHWALOVER_PORT/healthz"
+wait_for_url "ManhwaX scraper" "http://localhost:$MANHWAX_PORT/healthz"
 wait_for_url "Gomic API" "http://localhost:$API_PORT/healthz"
 wait_for_url "Gomic web admin" "http://127.0.0.1:$WEB_PORT/admin"
 
@@ -204,12 +210,12 @@ echo "Admin token: $ADMIN_TOKEN"
 echo "API: http://localhost:$API_PORT"
 echo "KomikCast scraper: http://localhost:$KOMIKCAST_PORT"
 echo "KomikIndo scraper: http://localhost:$KOMIKINDO_PORT"
-echo "Asura Scans scraper: http://localhost:$ASURASCANS_PORT"
-echo "MangaPill scraper: http://localhost:$MANGAPILL_PORT"
-echo "Weeb Central scraper: http://localhost:$WEBCENTRAL_PORT"
-echo "Komiku scraper: http://localhost:$KOMIKU_PORT"
-echo "Mangasusu scraper: http://localhost:$MANGASUSU_PORT"
-echo "Kiryuu scraper: http://localhost:$KIRYUU_PORT"
+echo "WestManga scraper: http://localhost:$WESTMANGA_PORT"
+echo "KomikTap scraper: http://localhost:$KOMIKTAP_PORT"
+echo "KomikIndo.co scraper: http://localhost:$KOMIKINDOCO_PORT"
+echo "ManhuaScan scraper: http://localhost:$MANHUASCAN_PORT"
+echo "ManhwaLover scraper: http://localhost:$MANHWALOVER_PORT"
+echo "ManhwaX scraper: http://localhost:$MANHWAX_PORT"
 echo
 echo "Press Ctrl+C to stop all services."
 
