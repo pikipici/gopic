@@ -93,7 +93,7 @@ class MangaThemesiaScraper(Scraper):
     def _chapter_url(self, series_id: str, chapter_slug: str) -> str:
         if chapter_slug.startswith("http"):
             return chapter_slug
-        if chapter_slug.endswith("bahasa-indonesia"):
+        if "chapter" in chapter_slug.lower() or chapter_slug.endswith("bahasa-indonesia"):
             return f"{self.config.base_url.rstrip('/')}/{chapter_slug}/"
         return f"{self.config.base_url.rstrip('/')}/{series_id}-chapter-{chapter_slug}-bahasa-indonesia/"
 
